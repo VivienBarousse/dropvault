@@ -7,4 +7,8 @@
     <version>1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     
+    <modules>
+        <module>dropvault-web</module>
+    </modules>
+    
 </project>
