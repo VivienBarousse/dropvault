@@ -16,10 +16,17 @@
  */
 package com.aperigeek.dropvault.web.rest.webdav;
 
+import com.aperigeek.dropvault.web.conf.ConfigService;
+import java.io.File;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import javax.ejb.EJB;
+import javax.ejb.Stateless;
 import javax.ws.rs.OPTIONS;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response.StatusType;
@@ -32,6 +39,8 @@ import net.java.dev.webdav.jaxrs.xml.elements.PropStat;
 import net.java.dev.webdav.jaxrs.xml.elements.Response;
 import net.java.dev.webdav.jaxrs.xml.elements.Status;
 import net.java.dev.webdav.jaxrs.xml.properties.CreationDate;
+import net.java.dev.webdav.jaxrs.xml.properties.GetContentLength;
+import net.java.dev.webdav.jaxrs.xml.properties.GetContentType;
 import net.java.dev.webdav.jaxrs.xml.properties.GetLastModified;
 import net.java.dev.webdav.jaxrs.xml.properties.ResourceType;
 
@@ -39,12 +48,17 @@ import net.java.dev.webdav.jaxrs.xml.properties.ResourceType;
  *
  * @author Vivien Barousse
  */
+@Stateless
 @Path("/dav/{user}/")
 public class RootFolderRestService {
     
+    @EJB
+    private ConfigService config;
+    
     @Produces("application/xml")
     @PROPFIND
-    public javax.ws.rs.core.Response propfind(@Context UriInfo uriInfo) {
+    public javax.ws.rs.core.Response propfind(@Context UriInfo uriInfo,
+            @PathParam("user") String user) {
         URI uri = uriInfo.getRequestUri();
         
         Response folder = new Response(new HRef(uri), 
@@ -57,10 +71,36 @@ public class RootFolderRestService {
                                 ResourceType.COLLECTION), 
                         new Status((StatusType) javax.ws.rs.core.Response.Status.OK)));
         
-        // TODO: add support for files in the root folder
+        List<Response> files = new ArrayList<Response>();
+        
+        File userHome = config.getStorageFolder(user);
+        for (File file : userHome.listFiles()) {
+            List<Object> props = new ArrayList<Object>();
+            
+            props.add(new CreationDate(new Date()));
+            props.add(new GetLastModified(new Date()));
+            
+            if (file.isDirectory()) {
+                props.add(ResourceType.COLLECTION);
+            } else {
+                props.add(new GetContentType("application/octet-stream"));
+                props.add(new GetContentLength(file.length()));
+            }
+            
+            Prop prop = new Prop(props.toArray());
+                    
+            Response fileRep = new Response(new HRef(uriInfo.getRequestUriBuilder().path(file.getName()).build()),
+                    null,
+                    null,
+                    null,
+                    new PropStat(prop, new Status(javax.ws.rs.core.Response.Status.OK)));
+            files.add(fileRep);
+        }
+        
+        files.add(folder);
         
         return javax.ws.rs.core.Response.status(207)
-                .entity(new MultiStatus(folder))
+                .entity(new MultiStatus(files.toArray(new Response[files.size()])))
                 .type("application/xml;charset=UTF-8")
                 .build();
     }
