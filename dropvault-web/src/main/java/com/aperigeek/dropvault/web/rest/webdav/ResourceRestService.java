@@ -37,6 +37,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
+import net.java.dev.webdav.jaxrs.methods.MKCOL;
 import net.java.dev.webdav.jaxrs.methods.PROPFIND;
 import net.java.dev.webdav.jaxrs.xml.elements.HRef;
 import net.java.dev.webdav.jaxrs.xml.elements.MultiStatus;
@@ -132,6 +133,17 @@ public class ResourceRestService {
         } catch (IOException ex) {
             return javax.ws.rs.core.Response.serverError().build();
         }
+        
+    }
+    
+    @MKCOL
+    public javax.ws.rs.core.Response mkcol(@PathParam("user") String user,
+            @PathParam("resource") String resource) {
+        
+        File file = config.getStorageFolder(user, resource);
+        file.mkdirs();
+        
+        return javax.ws.rs.core.Response.status(201).build();
         
     }
 
