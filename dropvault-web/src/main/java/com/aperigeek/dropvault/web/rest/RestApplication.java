@@ -16,6 +16,7 @@
  */
 package com.aperigeek.dropvault.web.rest;
 
+import com.aperigeek.dropvault.web.rest.webdav.ResourceRestService;
 import com.aperigeek.dropvault.web.rest.webdav.RootFolderRestService;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -37,7 +38,8 @@ public class RestApplication extends Application {
     @Override
     public Set<Class<?>> getClasses() {
         return new HashSet<Class<?>>(Arrays.asList(
-                RootFolderRestService.class));
+                RootFolderRestService.class,
+                ResourceRestService.class));
     }
     
     @Override
