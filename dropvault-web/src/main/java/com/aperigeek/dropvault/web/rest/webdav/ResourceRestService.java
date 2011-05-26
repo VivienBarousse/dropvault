@@ -29,6 +29,7 @@ import java.util.List;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.OPTIONS;
@@ -152,6 +153,17 @@ public class ResourceRestService {
         }
         
         return javax.ws.rs.core.Response.status(201).build();
+        
+    }
+    
+    @DELETE
+    public javax.ws.rs.core.Response delete(@PathParam("user") String user,
+            @PathParam("resource") String resource) {
+        
+        Resource res = fileService.getResource(user, resource);
+        fileService.delete(res);
+        
+        return javax.ws.rs.core.Response.ok().build();
         
     }
     

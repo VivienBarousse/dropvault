@@ -180,6 +180,18 @@ public class MongoFileService {
         return binary;
     }
     
+    public void delete(Resource resource) {
+        DBCollection files = mongo.getDataBase().getCollection("files");
+        DBCollection contents = mongo.getDataBase().getCollection("contents");
+        
+        for (Resource child : getChildren(resource)) {
+            delete(child);
+        }
+        
+        files.remove(new BasicDBObject("_id", resource.getId()));
+        contents.remove(new BasicDBObject("resource", resource.getId()));
+    }
+    
     protected Resource buildResource(DBObject obj) {
         if (obj == null) {
             return null;
