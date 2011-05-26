@@ -16,14 +16,14 @@
  */
 package com.aperigeek.dropvault.web.rest.webdav;
 
-import com.aperigeek.dropvault.web.conf.ConfigService;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
+import com.aperigeek.dropvault.web.beans.Resource;
+import com.aperigeek.dropvault.web.dao.MongoFileService;
+import com.aperigeek.dropvault.web.dao.ResourceAlreadyExistsException;
+import com.aperigeek.dropvault.web.dao.ResourceNotFoundException;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
@@ -57,11 +57,11 @@ import net.java.dev.webdav.jaxrs.xml.properties.ResourceType;
  * @author Vivien Barousse
  */
 @Stateless
-@Path("/dav/{user}/{resource}")
+@Path("/dav/{user}/{resource:(.*)}")
 public class ResourceRestService {
-
+    
     @EJB
-    private ConfigService config;
+    private MongoFileService fileService;
 
     @Produces("application/xml")
     @PROPFIND
@@ -69,15 +69,19 @@ public class ResourceRestService {
             @PathParam("user") String user,
             @PathParam("resource") String resource) {
 
-        File current = config.getStorageFolder(user, resource);
+        Resource current = fileService.getResource(user, resource);
+        
+        if (current == null) {
+            return javax.ws.rs.core.Response.status(404).build();
+        }
 
         List<Response> responses = new ArrayList<Response>();
-
+        
         responses.add(new Response(new HRef(uriInfo.getRequestUri()),
                 null, null, null, fileStat(current)));
 
         if (current.isDirectory()) {
-            for (File child : current.listFiles()) {
+            for (Resource child : fileService.getChildren(current)) {
                 responses.add(new Response(new HRef(uriInfo.getRequestUriBuilder().path(child.getName()).build()),
                         null, null, null, fileStat(child)));
             }
@@ -90,21 +94,23 @@ public class ResourceRestService {
     @GET
     public javax.ws.rs.core.Response get(@PathParam("user") String user,
             @PathParam("resource") String resource) {
-
-        File file = config.getStorageFolder(user, resource);
-
-        try {
-            FileInputStream in = new FileInputStream(file);
-            
-            return javax.ws.rs.core.Response.ok()
-                    .header("Last-Modified", new Rfc1123DateFormat().format(new Date(file.lastModified())))
-                    .header("Content-Length", file.length())
-                    .entity(in)
-                    .build();
-            
-        } catch (IOException ex) {
-            return javax.ws.rs.core.Response.serverError().build();
+        
+        Resource res = fileService.getResource(user, resource);
+        
+        if (res == null) {
+            return javax.ws.rs.core.Response.status(404).build();
         }
+        
+        byte[] data = fileService.get(res);
+        ByteArrayInputStream in = new ByteArrayInputStream(data);
+        
+        return javax.ws.rs.core.Response.ok()
+                .header("Content-Type", res.getContentType())
+                .header("Content-Length", res.getContentLength())
+                .header("Last-Modified", new Rfc1123DateFormat().format(res.getModificationDate()))
+                .entity(in)
+                .build();
+        
     }
     
     @Consumes("*/*")
@@ -112,24 +118,19 @@ public class ResourceRestService {
     public javax.ws.rs.core.Response put(@PathParam("user") String user,
             @PathParam("resource") String resource,
             @HeaderParam("Content-Length") long contentLength,
-            InputStream data) {
+            InputStream in) {
         
-        File file = config.getStorageFolder(user, resource);
+        if (contentLength > Integer.MAX_VALUE) {
+            return javax.ws.rs.core.Response.status(507).build();
+        }
         
         try {
-            FileOutputStream out = new FileOutputStream(file);
+            byte[] data = new byte[(int) contentLength];
+            in.read(data, 0, (int) contentLength);
             
-            byte[] buffer = new byte[1024];
-            int readed;
-            
-            while ((readed = data.read(buffer)) != -1) {
-                out.write(buffer, 0, readed);
-            }
-            
-            out.close();
+            fileService.put(user, resource, data);
             
             return javax.ws.rs.core.Response.ok().build();
-            
         } catch (IOException ex) {
             return javax.ws.rs.core.Response.serverError().build();
         }
@@ -140,8 +141,13 @@ public class ResourceRestService {
     public javax.ws.rs.core.Response mkcol(@PathParam("user") String user,
             @PathParam("resource") String resource) {
         
-        File file = config.getStorageFolder(user, resource);
-        file.mkdirs();
+        try {
+            fileService.mkcol(user, resource);
+        } catch (ResourceAlreadyExistsException ex) {
+            return javax.ws.rs.core.Response.status(405).build();
+        } catch (ResourceNotFoundException ex) {
+            return javax.ws.rs.core.Response.status(409).build();
+        }
         
         return javax.ws.rs.core.Response.status(201).build();
         
@@ -152,17 +158,17 @@ public class ResourceRestService {
         return javax.ws.rs.core.Response.ok().header("DAV", 1).build();
     }
 
-    protected PropStat fileStat(File file) {
+    protected PropStat fileStat(Resource res) {
         List<Object> props = new ArrayList<Object>();
 
-        props.add(new CreationDate(new Date(file.lastModified())));
-        props.add(new GetLastModified(new Date(file.lastModified())));
+        props.add(new CreationDate(res.getCreationDate()));
+        props.add(new GetLastModified(res.getModificationDate()));
 
-        if (file.isDirectory()) {
+        if (res.isDirectory()) {
             props.add(ResourceType.COLLECTION);
         } else {
-            props.add(new GetContentType("application/octet-stream"));
-            props.add(new GetContentLength(file.length()));
+            props.add(new GetContentType(res.getContentType()));
+            props.add(new GetContentLength(res.getContentLength()));
         }
 
         Prop prop = new Prop(props.toArray());
