@@ -89,7 +89,7 @@ public class ResourceRestService {
         responses.add(new Response(new HRef(uriInfo.getRequestUri()),
                 null, null, null, fileStat(current)));
 
-        if (current.isDirectory() && depth > 0) {
+        if (current.isDirectory() && depth != 0) {
             for (Resource child : fileService.getChildren(current)) {
                 responses.add(new Response(new HRef(uriInfo.getRequestUriBuilder().path(child.getName()).build()),
                         null, null, null, fileStat(child)));
