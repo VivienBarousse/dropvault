@@ -72,8 +72,12 @@ public class ResourceRestService {
     @PROPFIND
     public javax.ws.rs.core.Response propfind(@Context UriInfo uriInfo,
             @PathParam("user") String user,
-            @PathParam("resource") String resource) {
+            @PathParam("resource") String resource,
+            @HeaderParam("Depth") String depthStr) {
 
+        int depth = (depthStr == null || "Infinity".equals(depthStr)) ?
+                -1 : Integer.parseInt(depthStr);
+        
         Resource current = fileService.getResource(user, resource);
         
         if (current == null) {
@@ -85,7 +89,7 @@ public class ResourceRestService {
         responses.add(new Response(new HRef(uriInfo.getRequestUri()),
                 null, null, null, fileStat(current)));
 
-        if (current.isDirectory()) {
+        if (current.isDirectory() && depth > 0) {
             for (Resource child : fileService.getChildren(current)) {
                 responses.add(new Response(new HRef(uriInfo.getRequestUriBuilder().path(child.getName()).build()),
                         null, null, null, fileStat(child)));
