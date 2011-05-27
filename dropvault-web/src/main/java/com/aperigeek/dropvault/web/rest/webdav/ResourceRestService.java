@@ -24,6 +24,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
 import javax.ejb.EJB;
@@ -41,6 +42,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
 import net.java.dev.webdav.jaxrs.methods.COPY;
 import net.java.dev.webdav.jaxrs.methods.MKCOL;
+import net.java.dev.webdav.jaxrs.methods.MOVE;
 import net.java.dev.webdav.jaxrs.methods.PROPFIND;
 import net.java.dev.webdav.jaxrs.xml.elements.HRef;
 import net.java.dev.webdav.jaxrs.xml.elements.MultiStatus;
@@ -173,18 +175,40 @@ public class ResourceRestService {
             @PathParam("resource") String resource,
             @HeaderParam("Destination") String destination) {
         
-        URI uri = uriInfo.getRequestUri();
-        String uriStr = uri.toString();
-        String baseUriStr = uriStr.substring(0, uriStr.length() - resource.length());
-        URI baseUri = URI.create(baseUriStr);
-        
-        String dest = baseUri.relativize(URI.create(destination)).toString();
+        String uri = URLDecoder.decode(uriInfo.getRequestUri().toString());
+        String dest = URLDecoder.decode(destination).substring(uri.length() - resource.length());
         
         Resource res = fileService.getResource(user, resource);
         byte[] data = fileService.get(res);
         fileService.put(user, dest, data);
         
-        return javax.ws.rs.core.Response.ok().build();
+        return javax.ws.rs.core.Response.status(201).build();
+        
+    }
+    
+    @MOVE
+    public javax.ws.rs.core.Response move(@Context UriInfo uriInfo,
+            @PathParam("user") String user,
+            @PathParam("resource") String resource,
+            @HeaderParam("Destination") String destination) {
+        
+        String uri = URLDecoder.decode(uriInfo.getRequestUri().toString());
+        String dest = URLDecoder.decode(destination).substring(uri.length() - resource.length());
+        
+        // Quick and dirty implementation. It works, but the document changes
+        // id (it is deleted and then recreated)
+        // Changing the parent reference and the name would be more time
+        // and memory efficient
+        
+        // TODO: Change this!
+        Resource res = fileService.getResource(user, resource);
+        byte[] data = fileService.get(res);
+        fileService.put(user, dest, data);
+        
+        fileService.delete(res);
+        // End of Quick and dirty
+        
+        return javax.ws.rs.core.Response.status(201).build();
         
     }
 
