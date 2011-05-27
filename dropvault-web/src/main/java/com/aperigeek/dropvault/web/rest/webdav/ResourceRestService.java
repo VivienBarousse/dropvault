@@ -171,7 +171,7 @@ public class ResourceRestService {
     public javax.ws.rs.core.Response copy(@Context UriInfo uriInfo,
             @PathParam("user") String user,
             @PathParam("resource") String resource,
-            @PathParam("Destination") String destination) {
+            @HeaderParam("Destination") String destination) {
         
         URI uri = uriInfo.getRequestUri();
         String uriStr = uri.toString();
