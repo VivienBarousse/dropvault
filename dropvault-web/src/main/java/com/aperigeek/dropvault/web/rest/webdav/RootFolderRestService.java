@@ -39,6 +39,7 @@ import net.java.dev.webdav.jaxrs.xml.elements.PropStat;
 import net.java.dev.webdav.jaxrs.xml.elements.Response;
 import net.java.dev.webdav.jaxrs.xml.elements.Status;
 import net.java.dev.webdav.jaxrs.xml.properties.CreationDate;
+import net.java.dev.webdav.jaxrs.xml.properties.GetContentLength;
 import net.java.dev.webdav.jaxrs.xml.properties.GetContentType;
 import net.java.dev.webdav.jaxrs.xml.properties.GetLastModified;
 import net.java.dev.webdav.jaxrs.xml.properties.ResourceType;
@@ -79,11 +80,11 @@ public class RootFolderRestService {
             props.add(new CreationDate(new Date()));
             props.add(new GetLastModified(new Date()));
             
-            if (true){//file.isDirectory()) {
+            if (file.isDirectory()) {
                 props.add(ResourceType.COLLECTION);
             } else {
                 props.add(new GetContentType("application/octet-stream"));
-                //props.add(new GetContentLength(file.length()));
+                props.add(new GetContentLength(file.getContentLength()));
             }
             
             Prop prop = new Prop(props.toArray());
