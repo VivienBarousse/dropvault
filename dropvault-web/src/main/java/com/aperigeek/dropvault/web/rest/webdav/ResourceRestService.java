@@ -182,7 +182,7 @@ public class ResourceRestService {
         byte[] data = fileService.get(res);
         fileService.put(user, dest, data);
         
-        return javax.ws.rs.core.Response.status(201).build();
+        return javax.ws.rs.core.Response.created(URI.create(destination)).build();
         
     }
     
@@ -208,7 +208,7 @@ public class ResourceRestService {
         fileService.delete(res);
         // End of Quick and dirty
         
-        return javax.ws.rs.core.Response.status(201).build();
+        return javax.ws.rs.core.Response.created(URI.create(destination)).build();
         
     }
 
