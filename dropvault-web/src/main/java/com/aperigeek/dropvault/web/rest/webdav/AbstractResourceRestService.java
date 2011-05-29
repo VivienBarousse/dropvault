@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.ws.rs.OPTIONS;
 import javax.ws.rs.core.Response.StatusType;
+import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 import net.java.dev.webdav.jaxrs.xml.elements.HRef;
 import net.java.dev.webdav.jaxrs.xml.elements.MultiStatus;
@@ -57,17 +58,24 @@ public abstract class AbstractResourceRestService {
 
         List<Response> responses = new ArrayList<Response>();
         
-        responses.add(new Response(new HRef(uriInfo.getRequestUri()),
-                null, null, null, fileStat(current)));
-
-        if (current.isDirectory() && depth != 0) {
-            for (Resource child : getFileService().getChildren(current)) {
-                responses.add(new Response(new HRef(uriInfo.getRequestUriBuilder().path(child.getName()).build()),
-                        null, null, null, fileStat(child)));
-            }
-        }
+        addWithChildren(uriInfo.getRequestUriBuilder(), current, responses, depth);
 
         return javax.ws.rs.core.Response.status(207).entity(new MultiStatus(responses.toArray(new Response[responses.size()]))).build();
+    }
+    
+    private void addWithChildren(UriBuilder uri, Resource parent, List<Response> responses, int level) {
+        responses.add(new Response(new HRef(uri.build()),
+                null, null, null, fileStat(parent)));
+        
+        if (level == 0) {
+            return;
+        }
+        
+        if (parent.isDirectory()) {
+            for (Resource child : getFileService().getChildren(parent)) {
+                addWithChildren(uri.clone().path(child.getName()), child, responses, level - 1);
+            }
+        }
     }
     
     @OPTIONS
