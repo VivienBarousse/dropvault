@@ -25,8 +25,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URLDecoder;
-import java.util.ArrayList;
-import java.util.List;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.ws.rs.Consumes;
@@ -44,18 +42,7 @@ import net.java.dev.webdav.jaxrs.methods.COPY;
 import net.java.dev.webdav.jaxrs.methods.MKCOL;
 import net.java.dev.webdav.jaxrs.methods.MOVE;
 import net.java.dev.webdav.jaxrs.methods.PROPFIND;
-import net.java.dev.webdav.jaxrs.xml.elements.HRef;
-import net.java.dev.webdav.jaxrs.xml.elements.MultiStatus;
-import net.java.dev.webdav.jaxrs.xml.elements.Prop;
-import net.java.dev.webdav.jaxrs.xml.elements.PropStat;
-import net.java.dev.webdav.jaxrs.xml.elements.Response;
 import net.java.dev.webdav.jaxrs.xml.elements.Rfc1123DateFormat;
-import net.java.dev.webdav.jaxrs.xml.elements.Status;
-import net.java.dev.webdav.jaxrs.xml.properties.CreationDate;
-import net.java.dev.webdav.jaxrs.xml.properties.GetContentLength;
-import net.java.dev.webdav.jaxrs.xml.properties.GetContentType;
-import net.java.dev.webdav.jaxrs.xml.properties.GetLastModified;
-import net.java.dev.webdav.jaxrs.xml.properties.ResourceType;
 
 /**
  *
@@ -63,11 +50,12 @@ import net.java.dev.webdav.jaxrs.xml.properties.ResourceType;
  */
 @Stateless
 @Path("/dav/{user}/{resource:(.*)}")
-public class ResourceRestService {
+public class ResourceRestService extends AbstractResourceRestService {
     
     @EJB
     private MongoFileService fileService;
 
+    @Override
     @Produces("application/xml")
     @PROPFIND
     public javax.ws.rs.core.Response propfind(@Context UriInfo uriInfo,
@@ -75,28 +63,7 @@ public class ResourceRestService {
             @PathParam("resource") String resource,
             @HeaderParam("Depth") String depthStr) {
 
-        int depth = (depthStr == null || "Infinity".equals(depthStr)) ?
-                -1 : Integer.parseInt(depthStr);
-        
-        Resource current = fileService.getResource(user, resource);
-        
-        if (current == null) {
-            return javax.ws.rs.core.Response.status(404).build();
-        }
-
-        List<Response> responses = new ArrayList<Response>();
-        
-        responses.add(new Response(new HRef(uriInfo.getRequestUri()),
-                null, null, null, fileStat(current)));
-
-        if (current.isDirectory() && depth != 0) {
-            for (Resource child : fileService.getChildren(current)) {
-                responses.add(new Response(new HRef(uriInfo.getRequestUriBuilder().path(child.getName()).build()),
-                        null, null, null, fileStat(child)));
-            }
-        }
-
-        return javax.ws.rs.core.Response.status(207).entity(new MultiStatus(responses.toArray(new Response[responses.size()]))).build();
+        return super.propfind(uriInfo, user, resource, depthStr);
     }
 
     @Produces("application/octet-stream")
@@ -216,27 +183,14 @@ public class ResourceRestService {
         
     }
 
+    @Override
     @OPTIONS
     public javax.ws.rs.core.Response options() {
-        return javax.ws.rs.core.Response.ok().header("DAV", 1).build();
+        return super.options();
     }
-
-    protected PropStat fileStat(Resource res) {
-        List<Object> props = new ArrayList<Object>();
-
-        props.add(new CreationDate(res.getCreationDate()));
-        props.add(new GetLastModified(res.getModificationDate()));
-
-        if (res.isDirectory()) {
-            props.add(ResourceType.COLLECTION);
-        } else {
-            props.add(new GetContentType(res.getContentType()));
-            props.add(new GetContentLength(res.getContentLength()));
-        }
-
-        Prop prop = new Prop(props.toArray());
-        PropStat stat = new PropStat(prop, new Status(javax.ws.rs.core.Response.Status.OK));
-
-        return stat;
+    
+    @Override
+    protected MongoFileService getFileService() {
+        return fileService;
     }
 }
