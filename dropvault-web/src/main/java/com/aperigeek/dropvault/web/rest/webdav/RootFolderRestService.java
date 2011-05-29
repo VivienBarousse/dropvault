@@ -24,6 +24,7 @@ import java.util.Date;
 import java.util.List;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
+import javax.ws.rs.HeaderParam;
 import javax.ws.rs.OPTIONS;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -58,7 +59,12 @@ public class RootFolderRestService {
     @Produces("application/xml")
     @PROPFIND
     public javax.ws.rs.core.Response propfind(@Context UriInfo uriInfo,
-            @PathParam("user") String user) {
+            @PathParam("user") String user,
+            @HeaderParam("Depth") String depthStr) {
+
+        int depth = (depthStr == null || "Infinity".equals(depthStr)) ?
+                -1 : Integer.parseInt(depthStr);
+        
         URI uri = uriInfo.getRequestUri();
         
         Resource userHome = fileService.getRootFolder(user);
@@ -74,27 +80,30 @@ public class RootFolderRestService {
                         new Status((StatusType) javax.ws.rs.core.Response.Status.OK)));
         
         List<Response> files = new ArrayList<Response>();
-        for (Resource file : fileService.getChildren(userHome)) {
-            List<Object> props = new ArrayList<Object>();
-            
-            props.add(new CreationDate(new Date()));
-            props.add(new GetLastModified(new Date()));
-            
-            if (file.isDirectory()) {
-                props.add(ResourceType.COLLECTION);
-            } else {
-                props.add(new GetContentType("application/octet-stream"));
-                props.add(new GetContentLength(file.getContentLength()));
+        
+        if (depth != 0) {
+            for (Resource file : fileService.getChildren(userHome)) {
+                List<Object> props = new ArrayList<Object>();
+
+                props.add(new CreationDate(new Date()));
+                props.add(new GetLastModified(new Date()));
+
+                if (file.isDirectory()) {
+                    props.add(ResourceType.COLLECTION);
+                } else {
+                    props.add(new GetContentType("application/octet-stream"));
+                    props.add(new GetContentLength(file.getContentLength()));
+                }
+
+                Prop prop = new Prop(props.toArray());
+
+                Response fileRep = new Response(new HRef(uriInfo.getRequestUriBuilder().path(file.getName()).build()),
+                        null,
+                        null,
+                        null,
+                        new PropStat(prop, new Status(javax.ws.rs.core.Response.Status.OK)));
+                files.add(fileRep);
             }
-            
-            Prop prop = new Prop(props.toArray());
-                    
-            Response fileRep = new Response(new HRef(uriInfo.getRequestUriBuilder().path(file.getName()).build()),
-                    null,
-                    null,
-                    null,
-                    new PropStat(prop, new Status(javax.ws.rs.core.Response.Status.OK)));
-            files.add(fileRep);
         }
         
         files.add(folder);
