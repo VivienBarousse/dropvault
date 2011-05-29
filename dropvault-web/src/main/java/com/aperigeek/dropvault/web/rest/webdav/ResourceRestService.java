@@ -182,12 +182,6 @@ public class ResourceRestService extends AbstractResourceRestService {
         return javax.ws.rs.core.Response.created(URI.create(destination)).build();
         
     }
-
-    @Override
-    @OPTIONS
-    public javax.ws.rs.core.Response options() {
-        return super.options();
-    }
     
     @Override
     protected MongoFileService getFileService() {

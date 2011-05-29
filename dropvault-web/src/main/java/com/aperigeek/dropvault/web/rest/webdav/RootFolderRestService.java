@@ -50,12 +50,6 @@ public class RootFolderRestService extends AbstractResourceRestService {
     }
     
     @Override
-    @OPTIONS
-    public javax.ws.rs.core.Response options() {
-        return super.options();
-    }
-    
-    @Override
     protected MongoFileService getFileService() {
         return fileService;
     }

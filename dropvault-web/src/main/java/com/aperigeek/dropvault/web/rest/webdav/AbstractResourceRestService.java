@@ -20,6 +20,7 @@ import com.aperigeek.dropvault.web.beans.Resource;
 import com.aperigeek.dropvault.web.dao.MongoFileService;
 import java.util.ArrayList;
 import java.util.List;
+import javax.ws.rs.OPTIONS;
 import javax.ws.rs.core.Response.StatusType;
 import javax.ws.rs.core.UriInfo;
 import net.java.dev.webdav.jaxrs.xml.elements.HRef;
@@ -69,9 +70,11 @@ public abstract class AbstractResourceRestService {
         return javax.ws.rs.core.Response.status(207).entity(new MultiStatus(responses.toArray(new Response[responses.size()]))).build();
     }
     
+    @OPTIONS
     public javax.ws.rs.core.Response options() {
         return javax.ws.rs.core.Response.ok()
                 .header("DAV", 1)
+                .header("Allow", "OPTIONS,MKCOL,GET,DELETE,MOVE,PROPFIND,COPY,HEAD,PUT")
                 .build();
     }
 
