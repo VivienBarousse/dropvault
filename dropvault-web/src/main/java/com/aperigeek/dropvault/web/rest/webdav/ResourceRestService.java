@@ -21,6 +21,7 @@ import com.aperigeek.dropvault.web.dao.MongoFileService;
 import com.aperigeek.dropvault.web.dao.ResourceAlreadyExistsException;
 import com.aperigeek.dropvault.web.dao.ResourceNotFoundException;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -114,10 +115,14 @@ public class ResourceRestService extends AbstractResourceRestService {
         }
         
         try {
-            byte[] data = new byte[(int) contentLength];
-            in.read(data, 0, (int) contentLength);
+            ByteArrayOutputStream out = new ByteArrayOutputStream((int) contentLength);
+            byte[] buffer = new byte[4096];
+            int readed;
+            while ((readed = in.read(buffer)) != -1) {
+                out.write(buffer, 0, readed);
+            }
             
-            fileService.put(user, resource, data);
+            fileService.put(user, resource, out.toByteArray());
             
             return javax.ws.rs.core.Response.ok().build();
         } catch (IOException ex) {
