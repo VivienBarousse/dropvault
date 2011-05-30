@@ -57,23 +57,6 @@ public class MongoService {
         } catch (Exception ex) {
             log.log(Level.SEVERE, null, ex);
         }
-        
-        if (!mongo.getDatabaseNames().contains(db_name)) {
-            DB db = getDataBase();
-            
-            DBCollection users = db.getCollection("users");
-            users.insert(new BasicDBObject("name", "viv"));
-            
-            DBCollection files = db.getCollection("files");
-            
-            BasicDBObject root = new BasicDBObject();
-            root.append("type", Resource.ResourceType.FOLDER.toString());
-            root.append("name", "/");
-            root.append("user", "viv");
-            root.append("creationDate", new Date());
-            root.append("modificationDate", new Date());
-            files.insert(root);
-        }
     }
     
     public DB getDataBase() {
