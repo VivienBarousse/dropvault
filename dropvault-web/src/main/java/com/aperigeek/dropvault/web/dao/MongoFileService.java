@@ -43,13 +43,24 @@ public class MongoFileService {
     private FileTypeDetectionService fileTypeDetectionService;
     
     public Resource getRootFolder(String username) {
-        DBCollection col = mongo.getDataBase().getCollection("files");
+        DBCollection files = mongo.getDataBase().getCollection("files");
         
         DBObject filter = new BasicDBObject();
         filter.put("user", username);
         filter.put("name", "/");
         
-        DBObject root = col.findOne(filter);
+        DBObject root = files.findOne(filter);
+        
+        if (root == null) {
+            BasicDBObject newRoot = new BasicDBObject();
+            newRoot.append("type", Resource.ResourceType.FOLDER.toString());
+            newRoot.append("name", "/");
+            newRoot.append("user", username);
+            newRoot.append("creationDate", new Date());
+            newRoot.append("modificationDate", new Date());
+            files.insert(newRoot);
+            root = newRoot;
+        }
         
         Resource res = buildResource(root);
         
