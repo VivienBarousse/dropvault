@@ -17,6 +17,7 @@
 package com.aperigeek.dropvault.web.dao;
 
 import com.aperigeek.dropvault.web.beans.Resource;
+import com.aperigeek.dropvault.web.service.FileTypeDetectionService;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
@@ -37,6 +38,9 @@ public class MongoFileService {
     
     @EJB
     private MongoService mongo;
+    
+    @EJB
+    private FileTypeDetectionService fileTypeDetectionService;
     
     public Resource getRootFolder(String username) {
         DBCollection col = mongo.getDataBase().getCollection("files");
@@ -125,11 +129,17 @@ public class MongoFileService {
         return parent;
     }
     
-    public void put(String username, String resource, byte[] data) {
+    public void put(String username, String resource, byte[] data, 
+            String contentType) {
         String[] path = resource.split("/");
         Resource parent = getRootFolder(username);
         for (int i = 0; i < path.length - 1; i++) {
             parent = getChild(parent, path[i]);
+        }
+        
+        if (contentType == null) {
+            contentType = fileTypeDetectionService
+                    .detectFileType(path[path.length - 1], data);
         }
         
         DBCollection files = mongo.getDataBase().getCollection("files");
@@ -141,6 +151,7 @@ public class MongoFileService {
             filter.put("_id", child.getId());
             DBObject update = new BasicDBObject("modificationDate", new Date());
             update.put("contentLength", data.length);
+            update.put("contentType", contentType);
             files.update(filter, new BasicDBObject("$set", update));
             
             contents.update(new BasicDBObject("resource", child.getId()), 
@@ -155,7 +166,7 @@ public class MongoFileService {
             childObj.put("type", Resource.ResourceType.FILE.toString());
             childObj.put("creationDate", new Date());
             childObj.put("modificationDate", new Date());
-            childObj.put("contentType", "application/octet-stream");
+            childObj.put("contentType", contentType);
             childObj.put("contentLength", data.length);
             
             files.insert(childObj);

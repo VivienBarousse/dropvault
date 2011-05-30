@@ -32,7 +32,6 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
-import javax.ws.rs.OPTIONS;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -108,6 +107,7 @@ public class ResourceRestService extends AbstractResourceRestService {
     public javax.ws.rs.core.Response put(@PathParam("user") String user,
             @PathParam("resource") String resource,
             @HeaderParam("Content-Length") long contentLength,
+            @HeaderParam("Content-Type") String contentType,
             InputStream in) {
         
         if (contentLength > MAX_CONTENT_LENGTH) {
@@ -122,7 +122,7 @@ public class ResourceRestService extends AbstractResourceRestService {
                 out.write(buffer, 0, readed);
             }
             
-            fileService.put(user, resource, out.toByteArray());
+            fileService.put(user, resource, out.toByteArray(), contentType);
             
             return javax.ws.rs.core.Response.ok().build();
         } catch (IOException ex) {
@@ -169,7 +169,7 @@ public class ResourceRestService extends AbstractResourceRestService {
         
         Resource res = fileService.getResource(user, resource);
         byte[] data = fileService.get(res);
-        fileService.put(user, dest, data);
+        fileService.put(user, dest, data, res.getContentType());
         
         return javax.ws.rs.core.Response.created(URI.create(destination)).build();
         
@@ -192,7 +192,7 @@ public class ResourceRestService extends AbstractResourceRestService {
         // TODO: Change this!
         Resource res = fileService.getResource(user, resource);
         byte[] data = fileService.get(res);
-        fileService.put(user, dest, data);
+        fileService.put(user, dest, data, res.getContentType());
         
         fileService.delete(res);
         // End of Quick and dirty
