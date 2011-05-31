@@ -73,6 +73,17 @@ public class FilesService {
         }
     }
     
+    public File getFile(Resource res) {
+        File folder = context.getExternalFilesDir(null);
+        folder = new File(folder, "DropVault");
+        
+        String path = res.getHref().substring(baseURI.length());
+        path = URLDecoder.decode(path);
+        
+        File file = new File(folder, path);
+        return file;
+    }
+    
     private void insert(Resource parent, Resource current) 
             throws DAVException, IOException {
         if (parent != null) {
@@ -91,13 +102,7 @@ public class FilesService {
     }
     
     private void dump(Resource res) throws DAVException, IOException {
-        File folder = context.getExternalFilesDir(null);
-        folder = new File(folder, "DropVault");
-        
-        String path = res.getHref().substring(baseURI.length());
-        path = URLDecoder.decode(path);
-        
-        File file = new File(folder, path);
+        File file = getFile(res);
         file.getParentFile().mkdirs();
         
         FileOutputStream out = new FileOutputStream(file);
