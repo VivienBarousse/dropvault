@@ -22,10 +22,28 @@ package com.aperigeek.dropvault.android;
  */
 public class Resource {
     
+    public enum ResourceType {
+        FILE,
+        FOLDER;
+    }
+    
+    private ResourceType type;
+    
     private String name;
+
+    public Resource() {
+    }
 
     public Resource(String name) {
         this.name = name;
+    }
+
+    public ResourceType getType() {
+        return type;
+    }
+
+    public void setType(ResourceType type) {
+        this.type = type;
     }
 
     public String getName() {

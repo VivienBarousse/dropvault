@@ -20,8 +20,9 @@ import android.app.ListActivity;
 import android.content.Context;
 import android.database.DataSetObserver;
 import android.graphics.BitmapFactory;
-import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -29,14 +30,32 @@ import android.widget.LinearLayout;
 import android.widget.ListAdapter;
 import android.widget.TextView;
 import com.aperigeek.dropvault.R;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+import java.net.URLDecoder;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.JDOMException;
+import org.jdom.Namespace;
+import org.jdom.input.SAXBuilder;
 
 /**
  *
  * @author Vivien Barousse
  */
 public class FilesListActivity extends ListActivity {
+    
+    private static final Logger logger = Logger.getLogger(FilesListActivity.class.getName());
     
     private List<Resource> resources = Arrays.asList(
             new Resource("toto"),
@@ -116,6 +135,72 @@ public class FilesListActivity extends ListActivity {
         super.onResume();
 
         setListAdapter(new FilesListAdapter());
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.files_list_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.files_menu_refresh:
+                updateDB();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+    
+    protected void updateDB() {
+        try {
+            String baseHref = "http://thom.aperigeek.com:8080/dropvault/rs/dav/viv/";
+            
+            HttpClient client = new DefaultHttpClient();
+            
+            WebdavPropfind propfind = new WebdavPropfind();
+            propfind.setURI(URI.create(baseHref));
+            propfind.setHeader("Depth", "1");
+            HttpResponse res = client.execute(propfind);
+            
+            InputStream in = res.getEntity().getContent();
+            
+            SAXBuilder builder = new SAXBuilder();
+            Document document = builder.build(in);
+            
+            List<Element> responses = document.getRootElement()
+                    .getChildren("response", Namespace.getNamespace("DAV:"));
+            
+            resources = new ArrayList<Resource>();
+            
+            System.out.println(responses.size());
+            
+            for (Element response : responses) {
+                String href = URLDecoder.decode(response.getChild("href", Namespace.getNamespace("DAV:")).getTextTrim());
+                String name = href.substring(baseHref.length());
+                if (name.length() > 0) {
+                    Resource resource = new Resource(name);
+                    resource.setType(Resource.ResourceType.FOLDER);
+                    resources.add(resource);
+                }
+            }
+            
+            setListAdapter(new FilesListAdapter());
+        } catch (JDOMException ex) {
+            logger.log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            logger.log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    private static class WebdavPropfind extends HttpRequestBase {
+
+        @Override
+        public String getMethod() {
+            return "PROPFIND";
+        }
+        
     }
     
 }

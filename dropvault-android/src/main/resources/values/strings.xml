@@ -3,4 +3,6 @@
 
     <string name="app_name">DropVault</string>
     
+    <string name="files_menu_refresh">Refresh</string>
+    
 </resources>
