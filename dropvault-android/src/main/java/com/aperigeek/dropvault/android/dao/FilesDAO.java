@@ -56,6 +56,28 @@ public class FilesDAO extends SQLiteOpenHelper {
         onCreate(db);
     }
     
+    public Resource getParent(Resource resource) {
+        Cursor cursor = getReadableDatabase().rawQuery(
+                "SELECT p.name, p.href, p.type, p.content_type "
+                + "FROM files AS c "
+                + "INNER JOIN files AS p "
+                + "ON c.parent = p.href "
+                + "WHERE c.href=?",
+                new String[]{resource.getHref()});
+        
+        if (!cursor.moveToNext()) {
+            return null;
+        }
+        
+        Resource parent = new Resource();
+        parent.setName(cursor.getString(0));
+        parent.setHref(cursor.getString(1));
+        parent.setType(ResourceType.valueOf(cursor.getString(2)));
+        parent.setContentType(cursor.getString(3));
+        
+        return parent;
+    }
+    
     public Resource getResource(String baseURI) {
         Cursor cursor = getReadableDatabase().rawQuery(
                 "SELECT name, href, type, content_type FROM files WHERE href=?",

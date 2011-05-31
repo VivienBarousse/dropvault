@@ -44,6 +44,10 @@ public class FilesService {
         return dao.getResource(baseURI);
     }
     
+    public Resource getParent(Resource res) {
+        return dao.getParent(res);
+    }
+    
     public List<Resource> getChildren(Resource parent) {
         return dao.getChildren(parent);
     }
