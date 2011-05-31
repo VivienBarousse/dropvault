@@ -16,7 +16,6 @@
  */
 package com.aperigeek.dropvault.android;
 
-import android.content.Context;
 import android.database.DataSetObserver;
 import android.graphics.BitmapFactory;
 import android.view.LayoutInflater;
@@ -78,12 +77,26 @@ class FilesListAdapter implements ListAdapter {
 
     public View getView(int i, View oldView, ViewGroup parent) {
         
+        Resource resource = files.get(i);
+        
         // TODO: Reuse old view
         LinearLayout element = (LinearLayout) inflater.inflate(R.layout.files_list_item, parent, false);
         TextView providerName = (TextView) element.findViewById(R.id.file_name);
         ImageView providerIcon = (ImageView) element.findViewById(R.id.file_icon);
-        providerName.setText(files.get(i).getName());
-        providerIcon.setImageBitmap(BitmapFactory.decodeResource(element.getResources(), R.drawable.icon));
+        providerName.setText(resource.getName());
+        
+        int icon = R.drawable.icon;
+        if (resource.getType() == Resource.ResourceType.FOLDER) {
+            icon = R.drawable.folder;
+        } else {
+            if ("application/pdf".equals(resource.getContentType())) {
+                icon = R.drawable.mimetype_application_pdf;
+            } else if ("text/plain".equals(resource.getContentType())) {
+                icon = R.drawable.mimetype_text_plain;
+            }
+        }
+        providerIcon.setImageBitmap(BitmapFactory.decodeResource(element.getResources(), icon));
+        
         return element;
     }
 
