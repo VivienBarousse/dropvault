@@ -47,14 +47,15 @@ public class MongoFileService {
         
         DBObject filter = new BasicDBObject();
         filter.put("user", username);
-        filter.put("name", "/");
+        filter.put("root", true);
         
         DBObject root = files.findOne(filter);
         
         if (root == null) {
             BasicDBObject newRoot = new BasicDBObject();
             newRoot.append("type", Resource.ResourceType.FOLDER.toString());
-            newRoot.append("name", "/");
+            newRoot.append("name", username);
+            newRoot.append("root", true);
             newRoot.append("user", username);
             newRoot.append("creationDate", new Date());
             newRoot.append("modificationDate", new Date());
