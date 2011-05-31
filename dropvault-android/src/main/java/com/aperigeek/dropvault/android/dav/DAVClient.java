@@ -25,8 +25,12 @@ import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.apache.http.HttpResponse;
+import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -77,6 +81,15 @@ public class DAVClient {
     public List<Resource> getResources(Resource parent, int depth) throws DAVException {
         return getResources(parent, 
                 depth < 0 ? "Infinity" : Integer.toString(depth));
+    }
+    
+    public InputStream get(Resource res) throws DAVException {
+        try {
+            HttpGet get = new HttpGet(res.getHref());
+            return client.execute(get).getEntity().getContent();
+        } catch (IOException ex) {
+            throw new DAVException(ex);
+        }
     }
     
     protected List<Resource> getResources(Resource parent, String depth) throws DAVException {
