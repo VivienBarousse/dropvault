@@ -21,7 +21,10 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ListView;
 import com.aperigeek.dropvault.R;
+import com.aperigeek.dropvault.android.Resource.ResourceType;
 import com.aperigeek.dropvault.android.service.FilesService;
 import com.aperigeek.dropvault.android.service.SyncException;
 import java.util.Collections;
@@ -42,12 +45,15 @@ public class FilesListActivity extends ListActivity {
     private FilesService service;
     
     private Resource current;
+    
+    private FilesListAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         
         service = new FilesService(BASE_URI, this);
+        current = service.getRoot();
     }
     
     @Override
@@ -63,7 +69,7 @@ public class FilesListActivity extends ListActivity {
                 ? service.getChildren(current) 
                 : Collections.EMPTY_LIST;
         
-        FilesListAdapter adapter = new FilesListAdapter(
+        adapter = new FilesListAdapter(
                 (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE),
                 resources);
 
@@ -84,6 +90,18 @@ public class FilesListActivity extends ListActivity {
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onListItemClick(ListView l, View v, int position, long id) {
+        Resource resource = (Resource) adapter.getItem(position);
+        
+        if (resource.getType() == ResourceType.FOLDER) {
+            current = resource;
+            registerAdapter();
+        } else {
+            super.onListItemClick(l, v, position, id);
+        }
     }
 
     protected void updateDB() {
