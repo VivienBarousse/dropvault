@@ -32,6 +32,8 @@ public class Resource {
     private String href;
     
     private String name;
+    
+    private String contentType;
 
     public Resource() {
     }
@@ -62,6 +64,14 @@ public class Resource {
 
     public void setHref(String href) {
         this.href = href;
+    }
+
+    public String getContentType() {
+        return contentType;
+    }
+
+    public void setContentType(String contentType) {
+        this.contentType = contentType;
     }
 
     @Override

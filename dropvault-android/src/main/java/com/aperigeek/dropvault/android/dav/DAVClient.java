@@ -17,6 +17,7 @@
 package com.aperigeek.dropvault.android.dav;
 
 import com.aperigeek.dropvault.android.Resource;
+import com.aperigeek.dropvault.android.Resource.ResourceType;
 import com.aperigeek.dropvault.android.dav.http.HttpPropfind;
 import java.io.IOException;
 import java.io.InputStream;
@@ -118,8 +119,27 @@ public class DAVClient {
                 .getChild("prop", DAV_NS);
         
         r.setName(prop.getChild("displayname", DAV_NS).getTextTrim());
+        r.setType(isFolder(prop) ? ResourceType.FOLDER : ResourceType.FILE);
+        
+        if (r.getType() == ResourceType.FILE) {
+            r.setContentType(prop.getChild("getcontenttype", DAV_NS).getTextTrim());
+        }
         
         return r;
+    }
+    
+    protected boolean isFolder(Element prop) {
+        Element restype = prop.getChild("resourcetype", DAV_NS);
+        if (restype == null) {
+            return false;
+        }
+        
+        Element collection = restype.getChild("collection", DAV_NS);
+        if (collection == null) {
+            return false;
+        }
+        
+        return true;
     }
     
 }
