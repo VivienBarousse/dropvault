@@ -17,12 +17,13 @@
 package com.aperigeek.dropvault.android;
 
 import android.app.ListActivity;
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import com.aperigeek.dropvault.R;
-import com.aperigeek.dropvault.android.dav.DAVClient;
-import com.aperigeek.dropvault.android.dav.DAVException;
+import com.aperigeek.dropvault.android.service.FilesService;
+import com.aperigeek.dropvault.android.service.SyncException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
@@ -34,6 +35,8 @@ import java.util.logging.Logger;
  */
 public class FilesListActivity extends ListActivity {
 
+    public static final String BASE_URI = "http://thom.aperigeek.com:8080/dropvault/rs/dav/viv/";
+    
     private static final Logger logger = Logger.getLogger(FilesListActivity.class.getName());
     
     private List<Resource> resources = Arrays.asList(
@@ -42,6 +45,15 @@ public class FilesListActivity extends ListActivity {
             new Resource("titi"),
             new Resource("tutu"));
 
+    private FilesService service;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        
+        service = new FilesService(BASE_URI, this);
+    }
+    
     @Override
     protected void onResume() {
         super.onResume();
@@ -75,18 +87,12 @@ public class FilesListActivity extends ListActivity {
 
     protected void updateDB() {
         try {
-            String baseHref = "http://thom.aperigeek.com:8080/dropvault/rs/dav/viv/";
-
-            DAVClient client = new DAVClient();
-            
-            Resource root = client.getResource(baseHref);
-            
-            resources = client.getResources(root);
-
+            service.sync();
+            Resource root = service.getRoot();
+            resources = service.getChildren(root);
             registerAdapter();
-        } catch (DAVException ex) {
+        } catch (SyncException ex) {
             logger.log(Level.SEVERE, null, ex);
-            // Notify sync failed
         }
     }
 }
