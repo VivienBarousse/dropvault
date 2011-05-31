@@ -17,6 +17,8 @@
 package com.aperigeek.dropvault.android;
 
 import android.app.ListActivity;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -27,6 +29,7 @@ import com.aperigeek.dropvault.R;
 import com.aperigeek.dropvault.android.Resource.ResourceType;
 import com.aperigeek.dropvault.android.service.FilesService;
 import com.aperigeek.dropvault.android.service.SyncException;
+import java.io.File;
 import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
@@ -100,7 +103,11 @@ public class FilesListActivity extends ListActivity {
             current = resource;
             registerAdapter();
         } else {
-            super.onListItemClick(l, v, position, id);
+            Intent intent = new Intent();
+            intent.setAction(Intent.ACTION_VIEW);
+            File file = service.getFile(resource);
+            intent.setDataAndType(Uri.fromFile(file), resource.getContentType());
+            startActivity(intent);
         }
     }
 
