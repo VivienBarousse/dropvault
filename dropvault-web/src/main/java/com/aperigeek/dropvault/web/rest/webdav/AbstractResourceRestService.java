@@ -31,6 +31,7 @@ import net.java.dev.webdav.jaxrs.xml.elements.PropStat;
 import net.java.dev.webdav.jaxrs.xml.elements.Response;
 import net.java.dev.webdav.jaxrs.xml.elements.Status;
 import net.java.dev.webdav.jaxrs.xml.properties.CreationDate;
+import net.java.dev.webdav.jaxrs.xml.properties.DisplayName;
 import net.java.dev.webdav.jaxrs.xml.properties.GetContentLength;
 import net.java.dev.webdav.jaxrs.xml.properties.GetContentType;
 import net.java.dev.webdav.jaxrs.xml.properties.GetLastModified;
@@ -89,6 +90,7 @@ public abstract class AbstractResourceRestService {
     protected PropStat fileStat(Resource res) {
         List<Object> props = new ArrayList<Object>();
 
+        props.add(new DisplayName(res.getName()));
         props.add(new CreationDate(res.getCreationDate()));
         props.add(new GetLastModified(res.getModificationDate()));
 
