@@ -21,6 +21,7 @@ import com.aperigeek.dropvault.android.Resource.ResourceType;
 import com.aperigeek.dropvault.android.dav.http.HttpPropfind;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.http.HttpResponse;
@@ -113,7 +114,7 @@ public class DAVClient {
     protected Resource buildResource(Element resp) {
         Resource r = new Resource();
         
-        r.setHref(resp.getChild("href", DAV_NS).getTextTrim());
+        r.setHref(URLDecoder.decode(resp.getChild("href", DAV_NS).getTextTrim()));
         
         Element prop = resp.getChild("propstat", DAV_NS)
                 .getChild("prop", DAV_NS);
