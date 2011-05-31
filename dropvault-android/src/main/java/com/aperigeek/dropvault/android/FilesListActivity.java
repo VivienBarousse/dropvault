@@ -24,7 +24,7 @@ import android.view.MenuItem;
 import com.aperigeek.dropvault.R;
 import com.aperigeek.dropvault.android.service.FilesService;
 import com.aperigeek.dropvault.android.service.SyncException;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -38,14 +38,10 @@ public class FilesListActivity extends ListActivity {
     public static final String BASE_URI = "http://thom.aperigeek.com:8080/dropvault/rs/dav/viv/";
     
     private static final Logger logger = Logger.getLogger(FilesListActivity.class.getName());
-    
-    private List<Resource> resources = Arrays.asList(
-            new Resource("toto"),
-            new Resource("tata"),
-            new Resource("titi"),
-            new Resource("tutu"));
 
     private FilesService service;
+    
+    private Resource current;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,6 +58,11 @@ public class FilesListActivity extends ListActivity {
     }
 
     private void registerAdapter() {
+        List<Resource> resources 
+                = current != null 
+                ? service.getChildren(current) 
+                : Collections.EMPTY_LIST;
+        
         FilesListAdapter adapter = new FilesListAdapter(
                 (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE),
                 resources);
@@ -88,8 +89,7 @@ public class FilesListActivity extends ListActivity {
     protected void updateDB() {
         try {
             service.sync();
-            Resource root = service.getRoot();
-            resources = service.getChildren(root);
+            current = service.getRoot();
             registerAdapter();
         } catch (SyncException ex) {
             logger.log(Level.SEVERE, null, ex);
