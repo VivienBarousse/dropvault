@@ -29,6 +29,8 @@ public class Resource {
     
     private ResourceType type;
     
+    private String href;
+    
     private String name;
 
     public Resource() {
@@ -52,6 +54,36 @@ public class Resource {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getHref() {
+        return href;
+    }
+
+    public void setHref(String href) {
+        this.href = href;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Resource other = (Resource) obj;
+        if ((this.href == null) ? (other.href != null) : !this.href.equals(other.href)) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 71 * hash + (this.href != null ? this.href.hashCode() : 0);
+        return hash;
     }
     
 }
