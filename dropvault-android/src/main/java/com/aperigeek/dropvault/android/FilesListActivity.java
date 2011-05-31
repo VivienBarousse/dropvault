@@ -104,6 +104,17 @@ public class FilesListActivity extends ListActivity {
         }
     }
 
+    @Override
+    public void onBackPressed() {
+        Resource parent = service.getParent(current);
+        if (parent != null) {
+            current = parent;
+            registerAdapter();
+        } else {
+            super.onBackPressed();
+        }
+    }
+
     protected void updateDB() {
         try {
             service.sync();
