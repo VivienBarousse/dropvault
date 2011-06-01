@@ -89,10 +89,19 @@ class FilesListAdapter implements ListAdapter {
         if (resource.getType() == Resource.ResourceType.FOLDER) {
             icon = R.drawable.folder;
         } else {
+            // TODO: Build a correspondance map
             if ("application/pdf".equals(resource.getContentType())) {
                 icon = R.drawable.mimetype_application_pdf;
             } else if ("text/plain".equals(resource.getContentType())) {
                 icon = R.drawable.mimetype_text_plain;
+            } else if ("text/html".equals(resource.getContentType())) {
+                icon = R.drawable.mimetype_text_html;
+            } else if ("application/rtf".equals(resource.getContentType())) {
+                icon = R.drawable.mimetype_application_rtf;
+            } else if ("application/msword".equals(resource.getContentType())) {
+                icon = R.drawable.mimetype_application_msword;
+            } else if ("application/zip".equals(resource.getContentType())) {
+                icon = R.drawable.mimetype_application_zip;
             }
         }
         providerIcon.setImageBitmap(BitmapFactory.decodeResource(element.getResources(), icon));
