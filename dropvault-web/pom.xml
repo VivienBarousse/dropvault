@@ -30,6 +30,12 @@
             <groupId>net.java.dev.webdav</groupId>
             <artifactId>webdav-jaxrs</artifactId>
             <version>1.1.1</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>javax.ws.rs</groupId>
+                    <artifactId>jsr311-api</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.mongodb</groupId>
