@@ -19,6 +19,7 @@ package com.aperigeek.dropvault.web.dao;
 import com.aperigeek.dropvault.web.beans.Resource;
 import com.aperigeek.dropvault.web.service.FileTypeDetectionService;
 import com.mongodb.BasicDBObject;
+import com.mongodb.BasicDBObjectBuilder;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
@@ -192,6 +193,28 @@ public class MongoFileService {
             
             contents.insert(content);
         }
+    }
+    
+    public void move(String username, Resource source, String dest) throws ResourceNotFoundException {
+        String[] path = dest.split("/");
+        Resource parent = getRootFolder(username);
+        for (int i = 0; i < path.length - 1; i++) {
+            parent = getChild(parent, path[i]);
+            if (parent == null) {
+                throw new ResourceNotFoundException();
+            }
+        }
+        
+        DBCollection files = mongo.getDataBase().getCollection("files");
+        
+        DBObject update = new BasicDBObject("$set", new BasicDBObjectBuilder()
+                .append("parent", parent.getId())
+                .append("name", path[path.length - 1])
+                .get());
+        
+        DBObject filter = new BasicDBObject("_id", source.getId());
+        
+        files.update(filter, update);
     }
     
     public byte[] get(Resource resource) {
