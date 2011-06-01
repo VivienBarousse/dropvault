@@ -26,6 +26,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URLDecoder;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.ws.rs.Consumes;
@@ -127,6 +129,8 @@ public class ResourceRestService extends AbstractResourceRestService {
             return javax.ws.rs.core.Response.ok().build();
         } catch (IOException ex) {
             return javax.ws.rs.core.Response.serverError().build();
+        } catch (ResourceNotFoundException ex) {
+            return javax.ws.rs.core.Response.status(209).build();
         }
         
     }
@@ -169,7 +173,11 @@ public class ResourceRestService extends AbstractResourceRestService {
         
         Resource res = fileService.getResource(user, resource);
         byte[] data = fileService.get(res);
-        fileService.put(user, dest, data, res.getContentType());
+        try {
+            fileService.put(user, dest, data, res.getContentType());
+        } catch (ResourceNotFoundException ex) {
+            javax.ws.rs.core.Response.status(209).build();
+        }
         
         return javax.ws.rs.core.Response.created(URI.create(destination)).build();
         
@@ -192,7 +200,11 @@ public class ResourceRestService extends AbstractResourceRestService {
         // TODO: Change this!
         Resource res = fileService.getResource(user, resource);
         byte[] data = fileService.get(res);
-        fileService.put(user, dest, data, res.getContentType());
+        try {
+            fileService.put(user, dest, data, res.getContentType());
+        } catch (ResourceNotFoundException ex) {
+            javax.ws.rs.core.Response.status(209).build();
+        }
         
         fileService.delete(res);
         // End of Quick and dirty

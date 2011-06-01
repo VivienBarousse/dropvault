@@ -142,11 +142,14 @@ public class MongoFileService {
     }
     
     public void put(String username, String resource, byte[] data, 
-            String contentType) {
+            String contentType) throws ResourceNotFoundException {
         String[] path = resource.split("/");
         Resource parent = getRootFolder(username);
         for (int i = 0; i < path.length - 1; i++) {
             parent = getChild(parent, path[i]);
+            if (parent == null) {
+                throw new ResourceNotFoundException();
+            }
         }
         
         if (contentType == null) {
