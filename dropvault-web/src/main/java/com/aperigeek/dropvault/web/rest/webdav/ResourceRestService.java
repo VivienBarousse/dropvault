@@ -192,25 +192,14 @@ public class ResourceRestService extends AbstractResourceRestService {
         String uri = URLDecoder.decode(uriInfo.getRequestUri().toString());
         String dest = URLDecoder.decode(destination).substring(uri.length() - resource.length());
         
-        // Quick and dirty implementation. It works, but the document changes
-        // id (it is deleted and then recreated)
-        // Changing the parent reference and the name would be more time
-        // and memory efficient
-        
-        // TODO: Change this!
         Resource res = fileService.getResource(user, resource);
-        byte[] data = fileService.get(res);
         try {
-            fileService.put(user, dest, data, res.getContentType());
+            fileService.move(user, res, dest);
         } catch (ResourceNotFoundException ex) {
             javax.ws.rs.core.Response.status(209).build();
         }
         
-        fileService.delete(res);
-        // End of Quick and dirty
-        
         return javax.ws.rs.core.Response.created(URI.create(destination)).build();
-        
     }
     
     @Override
