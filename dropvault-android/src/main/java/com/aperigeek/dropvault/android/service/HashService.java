@@ -37,7 +37,7 @@ public class HashService {
     }
 
     protected String toHexString(byte[] data) {
-        StringBuilder builder = new StringBuilder(64);
+        StringBuilder builder = new StringBuilder(data.length * 2);
         for (byte b : data) {
             int val = (b >= 0 ? b : b + 256);
             if (val < 0x10) {
