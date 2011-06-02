@@ -17,10 +17,11 @@
 package com.aperigeek.dropvault.android.service;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import com.aperigeek.dropvault.android.Resource;
 import com.aperigeek.dropvault.android.dao.FilesDAO;
-import com.aperigeek.dropvault.android.dav.DAVClient;
 import com.aperigeek.dropvault.android.dav.DAVException;
+import com.aperigeek.dropvault.android.dav.DropDAVClient;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -34,22 +35,29 @@ import java.util.List;
  */
 public class FilesService {
     
-    private String baseURI;
+    private String username;
+    
+    private String password;
     
     private Context context;
     
     private FilesDAO dao;
     
-    private DAVClient client = new DAVClient();
-
-    public FilesService(String baseURI, Context context) {
-        this.baseURI = baseURI;
+    public FilesService(String username, String password, Context context) {
+        this.username = username;
+        this.password = password;
         this.context = context;
         dao = new FilesDAO(context);
     }
     
     public Resource getRoot() {
-        return dao.getResource(baseURI);
+        String baseUri = getBaseURI();
+        
+        if (baseUri == null) {
+            return null;
+        }
+        
+        return dao.getResource(baseUri);
     }
     
     public Resource getParent(Resource res) {
@@ -64,7 +72,11 @@ public class FilesService {
         try {
             dao.clear();
             
-            insert(null, client.getResource(baseURI));
+            DropDAVClient client = new DropDAVClient(username, password);
+            
+            setBaseURI(client.getBaseURI());
+            
+            insert(client, null, client.getRootResource());
         } catch (DAVException ex) {
             throw new SyncException(ex);
         } catch (IOException ex) {
@@ -76,14 +88,14 @@ public class FilesService {
         File folder = context.getExternalFilesDir(null);
         folder = new File(folder, "DropVault");
         
-        String path = res.getHref().substring(baseURI.length());
+        String path = res.getHref().substring(getBaseURI().length());
         path = URLDecoder.decode(path);
         
         File file = new File(folder, path);
         return file;
     }
     
-    private void insert(Resource parent, Resource current) 
+    private void insert(DropDAVClient client, Resource parent, Resource current) 
             throws DAVException, IOException {
         if (parent != null) {
             dao.insert(parent, current);
@@ -92,15 +104,15 @@ public class FilesService {
         }
         
         if (current.getType() == Resource.ResourceType.FILE) {
-            dump(current);
+            dump(client, current);
         }
         
         for (Resource child : client.getResources(current, 1)) {
-            insert(current, child);
+            insert(client, current, child);
         }
     }
     
-    private void dump(Resource res) throws DAVException, IOException {
+    private void dump(DropDAVClient client, Resource res) throws DAVException, IOException {
         File file = getFile(res);
         file.getParentFile().mkdirs();
         
@@ -113,5 +125,17 @@ public class FilesService {
         }
         out.close();
         in.close();
+    }
+    
+    protected String getBaseURI() {
+        SharedPreferences prefs = context.getSharedPreferences("URI_PREFS", 0);
+        return prefs.getString("baseURI", null);
+    }
+    
+    protected void setBaseURI(String baseUri) {
+        SharedPreferences prefs = context.getSharedPreferences("URI_PREFS", 0);
+        prefs.edit()
+                .putString("baseURI", baseUri)
+                .commit();
     }
 }

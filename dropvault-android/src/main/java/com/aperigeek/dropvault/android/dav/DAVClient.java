@@ -41,7 +41,7 @@ public class DAVClient {
     
     public static final Namespace DAV_NS = Namespace.getNamespace("DAV:");
     
-    private HttpClient client;
+    protected HttpClient client;
 
     public DAVClient() {
         client = new DefaultHttpClient();

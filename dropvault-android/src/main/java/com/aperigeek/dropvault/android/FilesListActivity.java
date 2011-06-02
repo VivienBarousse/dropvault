@@ -55,7 +55,7 @@ public class FilesListActivity extends ListActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         
-        service = new FilesService(BASE_URI, this);
+        service = new FilesService("viv", "viv", this);
         current = service.getRoot();
     }
     
