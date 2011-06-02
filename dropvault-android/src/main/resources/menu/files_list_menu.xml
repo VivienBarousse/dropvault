@@ -5,5 +5,10 @@
             android:title="@string/files_menu_refresh" 
             android:titleCondensed="@string/files_menu_refresh" 
             android:icon="@android:drawable/ic_menu_rotate" />
+    
+    <item android:id="@+id/files_menu_settings" 
+            android:title="@string/files_menu_settings" 
+            android:titleCondensed="@string/files_menu_settings" 
+            android:icon="@android:drawable/ic_menu_preferences" />
             
 </menu>

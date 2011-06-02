@@ -29,6 +29,7 @@ import com.aperigeek.dropvault.R;
 import com.aperigeek.dropvault.android.Resource.ResourceType;
 import com.aperigeek.dropvault.android.service.FilesService;
 import com.aperigeek.dropvault.android.service.SyncException;
+import com.aperigeek.dropvault.android.settings.SettingsActivity;
 import java.io.File;
 import java.util.Collections;
 import java.util.List;
@@ -95,6 +96,9 @@ public class FilesListActivity extends ListActivity {
         switch (item.getItemId()) {
             case R.id.files_menu_refresh:
                 updateDB();
+                return true;
+            case R.id.files_menu_settings:
+                startActivity(new Intent(this, SettingsActivity.class));
                 return true;
         }
         return super.onOptionsItemSelected(item);
