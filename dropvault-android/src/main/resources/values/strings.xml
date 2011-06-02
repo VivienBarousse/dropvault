@@ -3,6 +3,19 @@
 
     <string name="app_name">DropVault</string>
     
+    <string name="settings_activity_name">Settings</string>
+    
     <string name="files_menu_refresh">Refresh</string>
+    <string name="files_menu_settings">Settings</string>
+    
+    <string name="settings_account">Account details</string>
+    
+    <string name="settings_username_title">Username</string>
+    <string name="settings_username_summary">Username</string>
+    <string name="settings_username_dialog">Username</string>
+    
+    <string name="settings_password_title">Password</string>
+    <string name="settings_password_summary">Password</string>
+    <string name="settings_password_dialog">Password</string>
     
 </resources>
