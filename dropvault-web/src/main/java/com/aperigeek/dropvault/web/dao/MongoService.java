@@ -16,12 +16,8 @@
  */
 package com.aperigeek.dropvault.web.dao;
 
-import com.aperigeek.dropvault.web.beans.Resource;
-import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
-import com.mongodb.DBCollection;
 import com.mongodb.Mongo;
-import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.PostConstruct;

@@ -20,7 +20,6 @@ import com.aperigeek.dropvault.web.dao.MongoFileService;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.ws.rs.HeaderParam;
-import javax.ws.rs.OPTIONS;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
