@@ -81,8 +81,6 @@ public class FilesService {
     
     public void sync() throws SyncException {
         try {
-            dao.clear();
-            
             DropDAVClient client = new DropDAVClient(username, password);
             
             setBaseURI(client.getBaseURI());
@@ -108,14 +106,18 @@ public class FilesService {
     
     private void insert(DropDAVClient client, Resource parent, Resource current) 
             throws DAVException, IOException {
-        if (parent != null) {
-            dao.insert(parent, current);
-        } else {
-            dao.insert(current);
+        Resource local = dao.getResource(current.getHref());
+        
+        if (local == null) {
+            if (parent != null) {
+                dao.insert(parent, current);
+            } else {
+                dao.insert(current);
+            }
         }
         
         if (current.getType() == Resource.ResourceType.FILE) {
-            dump(client, current);
+            syncFile(client, current, local);
         }
         
         for (Resource child : client.getResources(current, 1)) {
@@ -123,12 +125,12 @@ public class FilesService {
         }
     }
     
-    private void dump(DropDAVClient client, Resource res) throws DAVException, IOException {
-        File file = getFile(res);
+    private void syncFile(DropDAVClient client, Resource remote, Resource local) throws DAVException, IOException {
+        File file = getFile(remote);
         file.getParentFile().mkdirs();
-        
+
         FileOutputStream out = new FileOutputStream(file);
-        InputStream in = client.get(res);
+        InputStream in = client.get(remote);
         byte[] buffer = new byte[4096];
         int readed;
         while ((readed = in.read(buffer)) != -1) {
