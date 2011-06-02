@@ -20,6 +20,7 @@ import com.aperigeek.dropvault.web.beans.User;
 import com.aperigeek.dropvault.web.dao.user.InvalidPasswordException;
 import com.aperigeek.dropvault.web.dao.user.UsersDAO;
 import java.net.URI;
+import java.net.URLEncoder;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.ws.rs.GET;
@@ -50,7 +51,7 @@ public class LoginRestService {
             
             URI davUri = uriInfo.getBaseUriBuilder()
                     .path("dav")
-                    .path(user.getUsername())
+                    .path(URLEncoder.encode(user.getUsername()))
                     .build();
             
             return Response.ok(davUri.toString()).build();
