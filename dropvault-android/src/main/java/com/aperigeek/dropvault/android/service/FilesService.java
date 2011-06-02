@@ -71,6 +71,10 @@ public class FilesService {
         return dao.getChildren(parent);
     }
     
+    public void close() {
+        dao.close();
+    }
+    
     public void sync() throws SyncException {
         try {
             dao.clear();

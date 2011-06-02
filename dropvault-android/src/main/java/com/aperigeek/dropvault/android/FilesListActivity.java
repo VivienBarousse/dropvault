@@ -66,6 +66,11 @@ public class FilesListActivity extends ListActivity {
         registerAdapter();
     }
 
+    @Override
+    protected void onDestroy() {
+        service.close();
+    }
+
     private void registerAdapter() {
         List<Resource> resources 
                 = current != null 
