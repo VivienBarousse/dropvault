@@ -18,8 +18,10 @@ package com.aperigeek.dropvault.android;
 
 import android.app.ListActivity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -51,12 +53,15 @@ public class FilesListActivity extends ListActivity {
     private Resource current;
     
     private FilesListAdapter adapter;
+    
+    private SharedPreferences prefs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         
-        service = new FilesService("viv", "viv", this);
+        prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        service = new FilesService(this);
         current = service.getRoot();
     }
     
@@ -64,6 +69,9 @@ public class FilesListActivity extends ListActivity {
     protected void onResume() {
         super.onResume();
 
+        service.setUsername(prefs.getString("username", null));
+        service.setPassword(prefs.getString("password", null));
+        
         registerAdapter();
     }
 

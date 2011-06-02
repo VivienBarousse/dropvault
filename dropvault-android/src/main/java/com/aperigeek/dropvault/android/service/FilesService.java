@@ -43,11 +43,15 @@ public class FilesService {
     
     private FilesDAO dao;
     
-    public FilesService(String username, String password, Context context) {
-        this.username = username;
-        this.password = password;
+    public FilesService(Context context) {
         this.context = context;
         dao = new FilesDAO(context);
+    }
+    
+    public FilesService(String username, String password, Context context) {
+        this(context);
+        this.username = username;
+        this.password = password;
     }
     
     public Resource getRoot() {
@@ -144,5 +148,21 @@ public class FilesService {
         prefs.edit()
                 .putString("baseURI", baseUri)
                 .commit();
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 }
