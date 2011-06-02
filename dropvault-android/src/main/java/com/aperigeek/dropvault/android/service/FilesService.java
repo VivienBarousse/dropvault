@@ -61,6 +61,9 @@ public class FilesService {
     }
     
     public Resource getParent(Resource res) {
+        if (res == null) {
+            return null;
+        }
         return dao.getParent(res);
     }
     
