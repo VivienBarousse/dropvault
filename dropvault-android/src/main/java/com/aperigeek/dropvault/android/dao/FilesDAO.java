@@ -102,7 +102,10 @@ public class FilesDAO extends SQLiteOpenHelper {
     
     public List<Resource> getChildren(Resource parent) {
         Cursor cursor = getReadableDatabase().rawQuery(
-                "SELECT name, href, type, content_type, lastmodified FROM files WHERE parent=?",
+                "SELECT name, href, type, content_type, lastmodified "
+                + "FROM files "
+                + "WHERE parent=? "
+                + "ORDER BY type DESC, name ASC",
                 new String[]{parent.getHref()});
         
         List<Resource> resources = new ArrayList<Resource>();
