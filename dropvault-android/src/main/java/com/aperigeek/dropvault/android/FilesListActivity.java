@@ -17,6 +17,7 @@
 package com.aperigeek.dropvault.android;
 
 import android.app.ListActivity;
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
@@ -27,6 +28,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
+import android.widget.Toast;
 import com.aperigeek.dropvault.R;
 import com.aperigeek.dropvault.android.Resource.ResourceType;
 import com.aperigeek.dropvault.android.service.FilesService;
@@ -126,7 +128,12 @@ public class FilesListActivity extends ListActivity {
             intent.setAction(Intent.ACTION_VIEW);
             File file = service.getFile(resource);
             intent.setDataAndType(Uri.fromFile(file), resource.getContentType());
-            startActivity(intent);
+            try {
+                startActivity(intent);
+            } catch (ActivityNotFoundException ex) {
+                Toast toast = Toast.makeText(this, "No application can open this file", 10);
+                toast.show();
+            }
         }
     }
 
