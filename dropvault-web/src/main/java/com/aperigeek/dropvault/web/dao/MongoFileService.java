@@ -130,6 +130,10 @@ public class MongoFileService {
         
         col.insert(obj);
         
+        col.update(new BasicDBObject("_id", parent.getId()), 
+                new BasicDBObject("$set", 
+                new BasicDBObject("modificationDate", new Date())));
+        
         return buildResource(obj);
     }
     
@@ -192,6 +196,10 @@ public class MongoFileService {
             content.put("binary", data);
             
             contents.insert(content);
+        
+            files.update(new BasicDBObject("_id", parent.getId()), 
+                    new BasicDBObject("$set", 
+                    new BasicDBObject("modificationDate", new Date())));
         }
     }
     
@@ -214,7 +222,16 @@ public class MongoFileService {
         
         DBObject filter = new BasicDBObject("_id", source.getId());
         
+        DBObject current = files.findOne(filter);
+        files.update(new BasicDBObject("_id", (ObjectId) current.get("parent")), 
+                new BasicDBObject("$set", 
+                new BasicDBObject("modificationDate", new Date())));
+        
         files.update(filter, update);
+        
+        files.update(new BasicDBObject("_id", parent.getId()), 
+                new BasicDBObject("$set", 
+                new BasicDBObject("modificationDate", new Date())));
     }
     
     public byte[] get(Resource resource) {
@@ -237,7 +254,14 @@ public class MongoFileService {
             delete(child);
         }
         
-        files.remove(new BasicDBObject("_id", resource.getId()));
+        DBObject filter = new BasicDBObject("_id", resource.getId());
+        
+        DBObject current = files.findOne(filter);
+        files.update(new BasicDBObject("_id", (ObjectId) current.get("parent")), 
+                new BasicDBObject("$set", 
+                new BasicDBObject("modificationDate", new Date())));
+        
+        files.remove(filter);
         contents.remove(new BasicDBObject("resource", resource.getId()));
     }
     
