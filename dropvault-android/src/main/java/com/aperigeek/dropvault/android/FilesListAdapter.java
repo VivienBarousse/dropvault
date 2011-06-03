@@ -81,9 +81,9 @@ class FilesListAdapter implements ListAdapter {
         
         // TODO: Reuse old view
         LinearLayout element = (LinearLayout) inflater.inflate(R.layout.files_list_item, parent, false);
-        TextView providerName = (TextView) element.findViewById(R.id.file_name);
-        ImageView providerIcon = (ImageView) element.findViewById(R.id.file_icon);
-        providerName.setText(resource.getName());
+        TextView fileName = (TextView) element.findViewById(R.id.file_name);
+        ImageView fileIcon = (ImageView) element.findViewById(R.id.file_icon);
+        fileName.setText(resource.getName());
         
         int icon = R.drawable.icon;
         if (resource.getType() == Resource.ResourceType.FOLDER) {
@@ -104,7 +104,7 @@ class FilesListAdapter implements ListAdapter {
                 icon = R.drawable.mimetype_application_zip;
             }
         }
-        providerIcon.setImageBitmap(BitmapFactory.decodeResource(element.getResources(), icon));
+        fileIcon.setImageBitmap(BitmapFactory.decodeResource(element.getResources(), icon));
         
         return element;
     }
