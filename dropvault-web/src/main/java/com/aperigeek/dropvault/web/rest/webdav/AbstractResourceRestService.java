@@ -119,6 +119,10 @@ public abstract class AbstractResourceRestService {
     protected void checkAuthentication(String username, String header) 
             throws InvalidPasswordException, NotAuthorizedException, ProtocolException {
         
+        if (header == null) {
+            throw new InvalidPasswordException();
+        }
+        
         Pattern headerPattern = Pattern.compile("Basic (.+)");
         Matcher headerMatcher = headerPattern.matcher(header);
         
