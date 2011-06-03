@@ -31,10 +31,13 @@ import android.widget.ListView;
 import android.widget.Toast;
 import com.aperigeek.dropvault.R;
 import com.aperigeek.dropvault.android.Resource.ResourceType;
+import com.aperigeek.dropvault.android.dav.DAVException;
+import com.aperigeek.dropvault.android.dav.InvalidPasswordException;
 import com.aperigeek.dropvault.android.service.FilesService;
 import com.aperigeek.dropvault.android.service.SyncException;
 import com.aperigeek.dropvault.android.settings.SettingsActivity;
 import java.io.File;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
@@ -155,6 +158,19 @@ public class FilesListActivity extends ListActivity {
             registerAdapter();
         } catch (SyncException ex) {
             logger.log(Level.SEVERE, null, ex);
+            if (ex.getCause() instanceof InvalidPasswordException) {
+                Toast toast = Toast.makeText(this, "Invalid credentials", 10);
+                toast.show();
+            } else if (ex.getCause() instanceof DAVException) {
+                Toast toast = Toast.makeText(this, "Error connecting to server", 10);
+                toast.show();
+            } else if (ex.getCause() instanceof IOException) {
+                Toast toast = Toast.makeText(this, "Error copying file on phone", 10);
+                toast.show();
+            } else {
+                Toast toast = Toast.makeText(this, "Unknown error during update", 10);
+                toast.show();
+            }
         }
     }
 }
