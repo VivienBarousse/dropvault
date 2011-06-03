@@ -115,6 +115,25 @@ public class FilesDAO extends SQLiteOpenHelper {
         return resources;
     }
     
+    public List<Resource> getAllResources() {
+        Cursor cursor = getReadableDatabase().rawQuery(
+                "SELECT name, href, type, content_type FROM files",
+                new String[]{});
+        
+        List<Resource> resources = new ArrayList<Resource>();
+        
+        while (cursor.moveToNext()) {
+            Resource resource = new Resource();
+            resource.setName(cursor.getString(0));
+            resource.setHref(cursor.getString(1));
+            resource.setType(ResourceType.valueOf(cursor.getString(2)));
+            resource.setContentType(cursor.getString(3));
+            resources.add(resource);
+        }
+        
+        return resources;
+    }
+    
     public void insert(Resource resource) {
         getWritableDatabase().execSQL("INSERT INTO files(name,href,type,content_type)"
                 + "VALUES (?, ?, ?, ?)", 
@@ -140,6 +159,17 @@ public class FilesDAO extends SQLiteOpenHelper {
     
     public void clear() {
         getWritableDatabase().execSQL("DELETE FROM files;");
+    }
+
+    public void removeAll(List<Resource> remove) {
+        for (Resource res : remove) {
+            remove(res);
+        }
+    }
+
+    public void remove(Resource res) {
+        getWritableDatabase().execSQL("DELETE FROM files WHERE href=?",
+                new String[]{res.getHref()});
     }
     
 }
