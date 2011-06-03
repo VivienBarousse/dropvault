@@ -21,12 +21,18 @@ import com.aperigeek.dropvault.android.Resource.ResourceType;
 import com.aperigeek.dropvault.android.dav.http.HttpPropfind;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.cookie.DateParseException;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
@@ -39,12 +45,17 @@ import org.jdom.input.SAXBuilder;
  */
 public class DAVClient {
     
+    public static final String DATE_FORMAT = "EEE, d MMM yyyy kk:mm:ss z";
+    
     public static final Namespace DAV_NS = Namespace.getNamespace("DAV:");
     
     protected HttpClient client;
+    
+    protected DateFormat dateFormat;
 
     public DAVClient() {
         client = new DefaultHttpClient();
+        dateFormat = new SimpleDateFormat(DATE_FORMAT);
     }
     
     public Resource getResource(String uri) throws DAVException {
@@ -62,6 +73,8 @@ public class DAVClient {
                     .getChild("response", DAV_NS);
             
             return buildResource(element);
+        } catch (ParseException ex) {
+            throw new DAVException("Error in XML returned by server", ex);
         } catch (JDOMException ex) {
             throw new DAVException("Error in XML returned by server", ex);
         } catch (IOException ex) {
@@ -105,6 +118,8 @@ public class DAVClient {
             resources.remove(parent);
             
             return resources;
+        } catch (ParseException ex) {
+            throw new DAVException("Error in XML returned by server", ex);
         } catch (JDOMException ex) {
             throw new DAVException("Error in XML returned by server", ex);
         } catch (IOException ex) {
@@ -112,7 +127,7 @@ public class DAVClient {
         }
     }
     
-    protected List<Resource> buildResources(List<Element> resps) {
+    protected List<Resource> buildResources(List<Element> resps) throws ParseException {
         List<Resource> resources = new ArrayList<Resource>();
         for (Element resp : resps) {
             resources.add(buildResource(resp));
@@ -120,7 +135,7 @@ public class DAVClient {
         return resources;
     }
     
-    protected Resource buildResource(Element resp) {
+    protected Resource buildResource(Element resp) throws ParseException {
         Resource r = new Resource();
         
         r.setHref(resp.getChild("href", DAV_NS).getTextTrim());
@@ -130,6 +145,9 @@ public class DAVClient {
         
         r.setName(prop.getChild("displayname", DAV_NS).getTextTrim());
         r.setType(isFolder(prop) ? ResourceType.FOLDER : ResourceType.FILE);
+        
+        String lastModified = prop.getChild("getlastmodified", DAV_NS).getTextTrim();
+        r.setLastModificationDate(dateFormat.parse(lastModified));
         
         if (r.getType() == ResourceType.FILE) {
             r.setContentType(prop.getChild("getcontenttype", DAV_NS).getTextTrim());

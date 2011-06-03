@@ -16,6 +16,8 @@
  */
 package com.aperigeek.dropvault.android;
 
+import java.util.Date;
+
 /**
  *
  * @author Vivien Barousse
@@ -34,6 +36,8 @@ public class Resource {
     private String name;
     
     private String contentType;
+    
+    private Date lastModificationDate;
 
     public Resource() {
     }
@@ -72,6 +76,14 @@ public class Resource {
 
     public void setContentType(String contentType) {
         this.contentType = contentType;
+    }
+
+    public Date getLastModificationDate() {
+        return lastModificationDate;
+    }
+
+    public void setLastModificationDate(Date lastModificationDate) {
+        this.lastModificationDate = lastModificationDate;
     }
 
     @Override
