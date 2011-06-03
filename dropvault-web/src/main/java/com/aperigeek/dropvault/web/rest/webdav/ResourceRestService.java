@@ -20,6 +20,7 @@ import com.aperigeek.dropvault.web.beans.Resource;
 import com.aperigeek.dropvault.web.dao.MongoFileService;
 import com.aperigeek.dropvault.web.dao.ResourceAlreadyExistsException;
 import com.aperigeek.dropvault.web.dao.ResourceNotFoundException;
+import com.aperigeek.dropvault.web.dao.user.UsersDAO;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -67,6 +68,9 @@ public class ResourceRestService extends AbstractResourceRestService {
     
     @EJB
     private MongoFileService fileService;
+    
+    @EJB
+    private UsersDAO usersDAO;
 
     @Override
     @Produces("application/xml")
@@ -203,5 +207,10 @@ public class ResourceRestService extends AbstractResourceRestService {
     @Override
     protected MongoFileService getFileService() {
         return fileService;
+    }
+
+    @Override
+    public UsersDAO getUsersDAO() {
+        return usersDAO;
     }
 }

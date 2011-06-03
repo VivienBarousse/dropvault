@@ -18,8 +18,12 @@ package com.aperigeek.dropvault.web.rest.webdav;
 
 import com.aperigeek.dropvault.web.beans.Resource;
 import com.aperigeek.dropvault.web.dao.MongoFileService;
+import com.aperigeek.dropvault.web.dao.user.InvalidPasswordException;
+import com.aperigeek.dropvault.web.dao.user.UsersDAO;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.ws.rs.OPTIONS;
 import javax.ws.rs.core.Response.StatusType;
 import javax.ws.rs.core.UriBuilder;
@@ -36,6 +40,7 @@ import net.java.dev.webdav.jaxrs.xml.properties.GetContentLength;
 import net.java.dev.webdav.jaxrs.xml.properties.GetContentType;
 import net.java.dev.webdav.jaxrs.xml.properties.GetLastModified;
 import net.java.dev.webdav.jaxrs.xml.properties.ResourceType;
+import org.apache.commons.codec.binary.Base64;
 
 /**
  *
@@ -108,5 +113,37 @@ public abstract class AbstractResourceRestService {
     }
     
     protected abstract MongoFileService getFileService();
+    
+    protected abstract UsersDAO getUsersDAO();
+    
+    protected void checkAuthentication(String username, String header) 
+            throws InvalidPasswordException, NotAuthorizedException, ProtocolException {
+        
+        Pattern headerPattern = Pattern.compile("Basic (.+)");
+        Matcher headerMatcher = headerPattern.matcher(header);
+        
+        if (!headerMatcher.matches()) {
+            throw new ProtocolException("Invalid Authorization header");
+        }
+        
+        String b64 = headerMatcher.group(1);
+        String headerContent = new String(Base64.decodeBase64(b64));
+
+        Pattern passwordPattern = Pattern.compile("(.+):([^:]+)");
+        Matcher passwordMatcher = passwordPattern.matcher(headerContent);
+
+        if (!passwordMatcher.matches()) {
+            throw new ProtocolException("Invalid authentication header");
+        }
+
+        String user = passwordMatcher.group(1);
+        String password = passwordMatcher.group(2);
+        
+        getUsersDAO().login(user, password);
+        
+        if (!user.equals(username)) {
+            throw new NotAuthorizedException();
+        }
+    }
     
 }

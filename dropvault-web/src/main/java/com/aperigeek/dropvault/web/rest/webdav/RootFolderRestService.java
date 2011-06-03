@@ -17,6 +17,7 @@
 package com.aperigeek.dropvault.web.rest.webdav;
 
 import com.aperigeek.dropvault.web.dao.MongoFileService;
+import com.aperigeek.dropvault.web.dao.user.UsersDAO;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.ws.rs.HeaderParam;
@@ -38,6 +39,9 @@ public class RootFolderRestService extends AbstractResourceRestService {
     @EJB
     private MongoFileService fileService;
     
+    @EJB
+    private UsersDAO usersDAO;
+    
     @Produces("application/xml")
     @PROPFIND
     public javax.ws.rs.core.Response propfind(@Context UriInfo uriInfo,
@@ -51,6 +55,11 @@ public class RootFolderRestService extends AbstractResourceRestService {
     @Override
     protected MongoFileService getFileService() {
         return fileService;
+    }
+
+    @Override
+    protected UsersDAO getUsersDAO() {
+        return usersDAO;
     }
     
 }
