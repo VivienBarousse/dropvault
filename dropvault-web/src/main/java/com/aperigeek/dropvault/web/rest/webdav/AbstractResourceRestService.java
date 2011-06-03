@@ -20,10 +20,12 @@ import com.aperigeek.dropvault.web.beans.Resource;
 import com.aperigeek.dropvault.web.dao.MongoFileService;
 import com.aperigeek.dropvault.web.dao.user.InvalidPasswordException;
 import com.aperigeek.dropvault.web.dao.user.UsersDAO;
+import com.aperigeek.dropvault.web.service.HashService;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.ejb.EJB;
 import javax.ws.rs.OPTIONS;
 import javax.ws.rs.core.Response.StatusType;
 import javax.ws.rs.core.UriBuilder;
@@ -47,6 +49,9 @@ import org.apache.commons.codec.binary.Base64;
  * @author Vivien Barousse
  */
 public abstract class AbstractResourceRestService {
+    
+    @EJB
+    private HashService hashService;
     
     protected javax.ws.rs.core.Response propfind(UriInfo uriInfo,
             String user,
@@ -132,7 +137,7 @@ public abstract class AbstractResourceRestService {
         
         String b64 = headerMatcher.group(1);
         String headerContent = new String(Base64.decodeBase64(b64));
-
+        
         Pattern passwordPattern = Pattern.compile("(.+):([^:]+)");
         Matcher passwordMatcher = passwordPattern.matcher(headerContent);
 
@@ -142,6 +147,7 @@ public abstract class AbstractResourceRestService {
 
         String user = passwordMatcher.group(1);
         String password = passwordMatcher.group(2);
+        password = hashService.hash(password);
         
         getUsersDAO().login(user, password);
         
