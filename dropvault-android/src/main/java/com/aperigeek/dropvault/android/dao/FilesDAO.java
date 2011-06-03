@@ -141,7 +141,8 @@ public class FilesDAO extends SQLiteOpenHelper {
     }
     
     public void insert(Resource resource) {
-        getWritableDatabase().execSQL("INSERT INTO files(name,href,type,content_type,lastmodified)"
+        getWritableDatabase().execSQL("INSERT OR REPLACE "
+                + "INTO files(name,href,type,content_type,lastmodified)"
                 + "VALUES (?, ?, ?, ?, ?)", 
                 new Object[]{
                     resource.getName(),
@@ -158,7 +159,8 @@ public class FilesDAO extends SQLiteOpenHelper {
             return;
         }
         
-        getWritableDatabase().execSQL("INSERT INTO files(name,href,type,content_type, parent, lastmodified)"
+        getWritableDatabase().execSQL("INSERT OR REPLACE "
+                + "INTO files(name,href,type,content_type, parent, lastmodified)"
                 + "VALUES (?, ?, ?, ?, ?, ?)", 
                 new Object[]{
                     resource.getName(),

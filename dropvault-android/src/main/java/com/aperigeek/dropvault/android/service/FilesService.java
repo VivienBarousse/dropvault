@@ -23,11 +23,15 @@ import com.aperigeek.dropvault.android.dao.FilesDAO;
 import com.aperigeek.dropvault.android.dav.DAVException;
 import com.aperigeek.dropvault.android.dav.DropDAVClient;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLDecoder;
+import java.rmi.Remote;
 import java.util.List;
+import java.util.logging.Logger;
 
 /**
  *
@@ -85,7 +89,7 @@ public class FilesService {
             
             setBaseURI(client.getBaseURI());
             
-            insert(client, null, client.getRootResource());
+            sync(client, null, client.getRootResource());
         } catch (DAVException ex) {
             throw new SyncException(ex);
         } catch (IOException ex) {
@@ -104,27 +108,74 @@ public class FilesService {
         return file;
     }
     
-    private void insert(DropDAVClient client, Resource parent, Resource current) 
+    private void sync(DropDAVClient client, Resource parent, Resource current) 
             throws DAVException, IOException {
         Resource local = dao.getResource(current.getHref());
         
-        if (local == null) {
-            if (parent != null) {
-                dao.insert(parent, current);
-            } else {
-                dao.insert(current);
+        if (local == null || current.getLastModificationDate().after(local.getLastModificationDate())) {
+            Logger.getAnonymousLogger().info(current.getHref() + " remotely modified, pulling");
+            pull(client, parent, current);
+        } else if (current.getLastModificationDate().before(local.getLastModificationDate())) {
+            Logger.getAnonymousLogger().info(current.getHref() + " locally modified, pushing");
+            push(client, parent, current);
+        } else {
+            Logger.getAnonymousLogger().info(current.getHref() + " not modified, syncing children");
+            for (Resource child : client.getResources(current)) {
+                sync(client, current, child);
             }
-        }
-        
-        if (current.getType() == Resource.ResourceType.FILE) {
-            syncFile(client, current, local);
-        }
-        
-        for (Resource child : client.getResources(current, 1)) {
-            insert(client, current, child);
         }
     }
     
+    private void pull(DropDAVClient client, Resource parent, Resource current) throws IOException, DAVException {
+        if (current.getType() == Resource.ResourceType.FILE) {
+            dao.insert(parent, current);
+            
+            File file = getFile(current);
+            file.getParentFile().mkdirs();
+
+            FileOutputStream out = new FileOutputStream(file);
+            InputStream in = client.get(current);
+            byte[] buffer = new byte[4096];
+            int readed;
+            while ((readed = in.read(buffer)) != -1) {
+                out.write(buffer, 0, readed);
+            }
+            out.close();
+            in.close();
+        }
+        dao.insert(parent, current);
+        
+        List<Resource> local = dao.getChildren(current);
+        List<Resource> remote = client.getResources(current, 1);
+        local.removeAll(remote);
+        
+        dao.removeAll(local);
+        
+        for (Resource child : remote) {
+            sync(client, current, child);
+        }
+    }
+    
+    // TODO: push isn't finished yet
+    private void push(DropDAVClient client, Resource parent, Resource current) throws DAVException, IOException {
+        if (current.getType() == Resource.ResourceType.FILE) {
+//            FileInputStream in = new FileInputStream(getFile(current));
+//            client.put(current, in);
+        }
+        // Set update date
+        
+        List<Resource> remote = client.getResources(current, 1);
+        List<Resource> local = dao.getChildren(current);
+        remote.removeAll(local);
+        
+//        client.deleteAll(remote);
+        
+        for (Resource child : local) {
+            sync(client, current, child);
+        }
+    }
+    
+    /*
     private void syncFile(DropDAVClient client, Resource remote, Resource local) throws DAVException, IOException {
         File file = getFile(remote);
         file.getParentFile().mkdirs();
@@ -139,6 +190,7 @@ public class FilesService {
         out.close();
         in.close();
     }
+     */
     
     protected String getBaseURI() {
         SharedPreferences prefs = context.getSharedPreferences("URI_PREFS", 0);
