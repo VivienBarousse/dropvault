@@ -45,6 +45,7 @@ public class DropDAVClient extends DAVClient {
     private HashService hash;
 
     public DropDAVClient(String username, String password) throws InvalidPasswordException, DAVException {
+        super(username, password);
         this.username = username;
         this.password = password;
         hash = new HashService();

@@ -26,13 +26,11 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.impl.cookie.DateParseException;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
@@ -49,21 +47,33 @@ public class DAVClient {
     
     public static final Namespace DAV_NS = Namespace.getNamespace("DAV:");
     
-    protected HttpClient client;
+    protected DefaultHttpClient client;
     
     protected DateFormat dateFormat;
-
-    public DAVClient() {
+    
+    public DAVClient(String username, String password) {
         client = new DefaultHttpClient();
+        
+        client.getCredentialsProvider().setCredentials(AuthScope.ANY, 
+                new UsernamePasswordCredentials(username, password));
+        
         dateFormat = new SimpleDateFormat(DATE_FORMAT);
     }
     
     public Resource getResource(String uri) throws DAVException {
         HttpPropfind propfind = new HttpPropfind(uri);
         propfind.addHeader("Depth", "0");
-        
+
         try {
             HttpResponse response = client.execute(propfind);
+            
+            if (response.getStatusLine().getStatusCode() == 401) {
+                throw new InvalidPasswordException();
+            }
+            
+            if (response.getStatusLine().getStatusCode() != 207) {
+                throw new DAVException("Unexpected HTTP code: " + response.getStatusLine().getStatusCode());
+            }
             
             InputStream in = response.getEntity().getContent();
             
