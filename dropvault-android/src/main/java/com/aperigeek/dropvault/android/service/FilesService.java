@@ -113,13 +113,10 @@ public class FilesService {
         Resource local = dao.getResource(current.getHref());
         
         if (local == null || current.getLastModificationDate().after(local.getLastModificationDate())) {
-            Logger.getAnonymousLogger().info(current.getHref() + " remotely modified, pulling");
             pull(client, parent, current);
         } else if (current.getLastModificationDate().before(local.getLastModificationDate())) {
-            Logger.getAnonymousLogger().info(current.getHref() + " locally modified, pushing");
             push(client, parent, current);
         } else {
-            Logger.getAnonymousLogger().info(current.getHref() + " not modified, syncing children");
             for (Resource child : client.getResources(current)) {
                 sync(client, current, child);
             }
