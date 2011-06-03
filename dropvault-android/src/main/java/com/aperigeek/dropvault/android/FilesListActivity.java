@@ -77,6 +77,8 @@ public class FilesListActivity extends ListActivity {
 
     @Override
     protected void onDestroy() {
+        super.onDestroy();
+        
         service.close();
     }
 
