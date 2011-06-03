@@ -142,7 +142,7 @@ public class FilesDAO extends SQLiteOpenHelper {
     
     public void insert(Resource resource) {
         getWritableDatabase().execSQL("INSERT INTO files(name,href,type,content_type,lastmodified)"
-                + "VALUES (?, ?, ?, ?)", 
+                + "VALUES (?, ?, ?, ?, ?)", 
                 new Object[]{
                     resource.getName(),
                     resource.getHref(),
@@ -159,7 +159,7 @@ public class FilesDAO extends SQLiteOpenHelper {
         }
         
         getWritableDatabase().execSQL("INSERT INTO files(name,href,type,content_type, parent, lastmodified)"
-                + "VALUES (?, ?, ?, ?, ?)", 
+                + "VALUES (?, ?, ?, ?, ?, ?)", 
                 new Object[]{
                     resource.getName(),
                     resource.getHref(),
