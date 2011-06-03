@@ -5,12 +5,12 @@
     <parent>
         <groupId>com.aperigeek.dropvault</groupId>
         <artifactId>dropvault</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <version>1.0-alpha3</version>
     </parent>
 
     <groupId>com.aperigeek.dropvault</groupId>
     <artifactId>dropvault-web</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0-alpha3</version>
     <packaging>war</packaging>
 
     <properties>
