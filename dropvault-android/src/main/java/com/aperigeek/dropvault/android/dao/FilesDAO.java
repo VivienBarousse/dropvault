@@ -76,7 +76,7 @@ public class FilesDAO extends SQLiteOpenHelper {
         parent.setHref(cursor.getString(1));
         parent.setType(ResourceType.valueOf(cursor.getString(2)));
         parent.setContentType(cursor.getString(3));
-        parent.setLastModificationDate(new Date(cursor.getInt(4)));
+        parent.setLastModificationDate(new Date(cursor.getLong(4)));
         
         return parent;
     }
@@ -95,7 +95,7 @@ public class FilesDAO extends SQLiteOpenHelper {
         resource.setHref(cursor.getString(1));
         resource.setType(ResourceType.valueOf(cursor.getString(2)));
         resource.setContentType(cursor.getString(3));
-        resource.setLastModificationDate(new Date(cursor.getInt(4)));
+        resource.setLastModificationDate(new Date(cursor.getLong(4)));
         
         return resource;
     }
@@ -113,7 +113,7 @@ public class FilesDAO extends SQLiteOpenHelper {
             resource.setHref(cursor.getString(1));
             resource.setType(ResourceType.valueOf(cursor.getString(2)));
             resource.setContentType(cursor.getString(3));
-            resource.setLastModificationDate(new Date(cursor.getInt(4)));
+            resource.setLastModificationDate(new Date(cursor.getLong(4)));
             resources.add(resource);
         }
         
@@ -133,7 +133,7 @@ public class FilesDAO extends SQLiteOpenHelper {
             resource.setHref(cursor.getString(1));
             resource.setType(ResourceType.valueOf(cursor.getString(2)));
             resource.setContentType(cursor.getString(3));
-            resource.setLastModificationDate(new Date(cursor.getInt(4)));
+            resource.setLastModificationDate(new Date(cursor.getLong(4)));
             resources.add(resource);
         }
         
