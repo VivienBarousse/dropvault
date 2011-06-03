@@ -17,7 +17,10 @@
 package com.aperigeek.dropvault.web.rest.webdav;
 
 import com.aperigeek.dropvault.web.dao.MongoFileService;
+import com.aperigeek.dropvault.web.dao.user.InvalidPasswordException;
 import com.aperigeek.dropvault.web.dao.user.UsersDAO;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.ws.rs.HeaderParam;
@@ -46,8 +49,21 @@ public class RootFolderRestService extends AbstractResourceRestService {
     @PROPFIND
     public javax.ws.rs.core.Response propfind(@Context UriInfo uriInfo,
             @PathParam("user") String user,
-            @HeaderParam("Depth") String depthStr) {
-
+            @HeaderParam("Depth") String depthStr,
+            @HeaderParam("Authorization") String authorization) {
+        
+        try {
+            checkAuthentication(user, authorization);
+        } catch (InvalidPasswordException ex) {
+            return javax.ws.rs.core.Response.status(401)
+                    .header("WWW-Authenticate", "Basic realm=\"DAV client\"")
+                    .build();
+        } catch (NotAuthorizedException ex) {
+            return javax.ws.rs.core.Response.status(403).build();
+        } catch (ProtocolException ex) {
+            return javax.ws.rs.core.Response.status(400).build();
+        }
+        
         return super.propfind(uriInfo, user, ".", depthStr);
         
     }

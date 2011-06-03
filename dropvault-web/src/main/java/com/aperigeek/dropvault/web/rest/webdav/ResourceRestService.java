@@ -20,6 +20,7 @@ import com.aperigeek.dropvault.web.beans.Resource;
 import com.aperigeek.dropvault.web.dao.MongoFileService;
 import com.aperigeek.dropvault.web.dao.ResourceAlreadyExistsException;
 import com.aperigeek.dropvault.web.dao.ResourceNotFoundException;
+import com.aperigeek.dropvault.web.dao.user.InvalidPasswordException;
 import com.aperigeek.dropvault.web.dao.user.UsersDAO;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -72,13 +73,25 @@ public class ResourceRestService extends AbstractResourceRestService {
     @EJB
     private UsersDAO usersDAO;
 
-    @Override
     @Produces("application/xml")
     @PROPFIND
     public javax.ws.rs.core.Response propfind(@Context UriInfo uriInfo,
             @PathParam("user") String user,
             @PathParam("resource") String resource,
-            @HeaderParam("Depth") String depthStr) {
+            @HeaderParam("Depth") String depthStr,
+            @HeaderParam("Authorization") String authorization) {
+        
+        try {
+            checkAuthentication(user, authorization);
+        } catch (InvalidPasswordException ex) {
+            return javax.ws.rs.core.Response.status(401)
+                    .header("WWW-Authenticate", "Basic realm=\"DAV client\"")
+                    .build();
+        } catch (NotAuthorizedException ex) {
+            return javax.ws.rs.core.Response.status(403).build();
+        } catch (ProtocolException ex) {
+            return javax.ws.rs.core.Response.status(400).build();
+        }
 
         return super.propfind(uriInfo, user, resource, depthStr);
     }
@@ -86,7 +99,20 @@ public class ResourceRestService extends AbstractResourceRestService {
     @Produces("application/octet-stream")
     @GET
     public javax.ws.rs.core.Response get(@PathParam("user") String user,
-            @PathParam("resource") String resource) {
+            @PathParam("resource") String resource,
+            @HeaderParam("Authorization") String authorization) {
+        
+        try {
+            checkAuthentication(user, authorization);
+        } catch (InvalidPasswordException ex) {
+            return javax.ws.rs.core.Response.status(401)
+                    .header("WWW-Authenticate", "Basic realm=\"DAV client\"")
+                    .build();
+        } catch (NotAuthorizedException ex) {
+            return javax.ws.rs.core.Response.status(403).build();
+        } catch (ProtocolException ex) {
+            return javax.ws.rs.core.Response.status(400).build();
+        }
         
         Resource res = fileService.getResource(user, resource);
         
@@ -112,7 +138,20 @@ public class ResourceRestService extends AbstractResourceRestService {
             @PathParam("resource") String resource,
             @HeaderParam("Content-Length") long contentLength,
             @HeaderParam("Content-Type") String contentType,
+            @HeaderParam("Authorization") String authorization,
             InputStream in) {
+        
+        try {
+            checkAuthentication(user, authorization);
+        } catch (InvalidPasswordException ex) {
+            return javax.ws.rs.core.Response.status(401)
+                    .header("WWW-Authenticate", "Basic realm=\"DAV client\"")
+                    .build();
+        } catch (NotAuthorizedException ex) {
+            return javax.ws.rs.core.Response.status(403).build();
+        } catch (ProtocolException ex) {
+            return javax.ws.rs.core.Response.status(400).build();
+        }
         
         if (contentLength > MAX_CONTENT_LENGTH) {
             return javax.ws.rs.core.Response.status(507).build();
@@ -139,7 +178,20 @@ public class ResourceRestService extends AbstractResourceRestService {
     
     @MKCOL
     public javax.ws.rs.core.Response mkcol(@PathParam("user") String user,
-            @PathParam("resource") String resource) {
+            @PathParam("resource") String resource,
+            @HeaderParam("Authorization") String authorization) {
+        
+        try {
+            checkAuthentication(user, authorization);
+        } catch (InvalidPasswordException ex) {
+            return javax.ws.rs.core.Response.status(401)
+                    .header("WWW-Authenticate", "Basic realm=\"DAV client\"")
+                    .build();
+        } catch (NotAuthorizedException ex) {
+            return javax.ws.rs.core.Response.status(403).build();
+        } catch (ProtocolException ex) {
+            return javax.ws.rs.core.Response.status(400).build();
+        }
         
         try {
             fileService.mkcol(user, resource);
@@ -155,7 +207,20 @@ public class ResourceRestService extends AbstractResourceRestService {
     
     @DELETE
     public javax.ws.rs.core.Response delete(@PathParam("user") String user,
-            @PathParam("resource") String resource) {
+            @PathParam("resource") String resource,
+            @HeaderParam("Authorization") String authorization) {
+        
+        try {
+            checkAuthentication(user, authorization);
+        } catch (InvalidPasswordException ex) {
+            return javax.ws.rs.core.Response.status(401)
+                    .header("WWW-Authenticate", "Basic realm=\"DAV client\"")
+                    .build();
+        } catch (NotAuthorizedException ex) {
+            return javax.ws.rs.core.Response.status(403).build();
+        } catch (ProtocolException ex) {
+            return javax.ws.rs.core.Response.status(400).build();
+        }
         
         Resource res = fileService.getResource(user, resource);
         fileService.delete(res);
@@ -168,7 +233,20 @@ public class ResourceRestService extends AbstractResourceRestService {
     public javax.ws.rs.core.Response copy(@Context UriInfo uriInfo,
             @PathParam("user") String user,
             @PathParam("resource") String resource,
-            @HeaderParam("Destination") String destination) {
+            @HeaderParam("Destination") String destination,
+            @HeaderParam("Authorization") String authorization) {
+        
+        try {
+            checkAuthentication(user, authorization);
+        } catch (InvalidPasswordException ex) {
+            return javax.ws.rs.core.Response.status(401)
+                    .header("WWW-Authenticate", "Basic realm=\"DAV client\"")
+                    .build();
+        } catch (NotAuthorizedException ex) {
+            return javax.ws.rs.core.Response.status(403).build();
+        } catch (ProtocolException ex) {
+            return javax.ws.rs.core.Response.status(400).build();
+        }
         
         String uri = URLDecoder.decode(uriInfo.getRequestUri().toString());
         String dest = URLDecoder.decode(destination).substring(uri.length() - resource.length());
@@ -189,7 +267,20 @@ public class ResourceRestService extends AbstractResourceRestService {
     public javax.ws.rs.core.Response move(@Context UriInfo uriInfo,
             @PathParam("user") String user,
             @PathParam("resource") String resource,
-            @HeaderParam("Destination") String destination) {
+            @HeaderParam("Destination") String destination,
+            @HeaderParam("Authorization") String authorization) {
+        
+        try {
+            checkAuthentication(user, authorization);
+        } catch (InvalidPasswordException ex) {
+            return javax.ws.rs.core.Response.status(401)
+                    .header("WWW-Authenticate", "Basic realm=\"DAV client\"")
+                    .build();
+        } catch (NotAuthorizedException ex) {
+            return javax.ws.rs.core.Response.status(403).build();
+        } catch (ProtocolException ex) {
+            return javax.ws.rs.core.Response.status(400).build();
+        }
         
         String uri = URLDecoder.decode(uriInfo.getRequestUri().toString());
         String dest = URLDecoder.decode(destination).substring(uri.length() - resource.length());
