@@ -157,6 +157,8 @@ public class FilesService {
     }
     
     // TODO: push isn't finished yet
+    // The application doesn't allow file editing yet so this should be 
+    // ok for now
     private void push(DropDAVClient client, Resource parent, Resource current) throws DAVException, IOException {
         if (current.getType() == Resource.ResourceType.FILE) {
 //            FileInputStream in = new FileInputStream(getFile(current));
