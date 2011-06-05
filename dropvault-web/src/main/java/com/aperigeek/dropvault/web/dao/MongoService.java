@@ -36,7 +36,7 @@ public class MongoService {
     private static final Logger log = Logger.getLogger(MongoService.class.getName());
     
     // TODO: Export in config file
-    private static final String db_host = "localhost";
+    private static final String db_host = "127.0.0.1";
     
     // TODO: Export in config file
     private static final int db_port = 27017;
