@@ -1,0 +1,7 @@
+Dropvault helps you synchronize your files between your different devices.
+
+The web application provides a WebDAV endpoint for you to push your files,
+and is intended to be used as a mount point on your computer.
+
+The android application keeps a local copy of the shared folder and allows
+you to access your files even when your phone is offline.
