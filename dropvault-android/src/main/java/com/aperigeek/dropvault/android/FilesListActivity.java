@@ -23,10 +23,14 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.ListView;
 import android.widget.Toast;
 import com.aperigeek.dropvault.R;
@@ -78,6 +82,8 @@ public class FilesListActivity extends ListActivity {
         service.setPassword(prefs.getString("password", null));
         
         registerAdapter();
+        
+        registerForContextMenu(getListView());
     }
 
     @Override
@@ -138,6 +144,35 @@ public class FilesListActivity extends ListActivity {
                 toast.show();
             }
         }
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.files_list_context, menu);
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
+        Resource resource = (Resource) adapter.getItem(info.position);
+        
+        switch (item.getItemId()) {
+            case R.id.files_context_edit:
+                Intent intent = new Intent();
+                intent.setAction(Intent.ACTION_EDIT);
+                File file = service.getFile(resource);
+                intent.setDataAndType(Uri.fromFile(file), resource.getContentType());
+                try {
+                    startActivity(intent);
+                } catch (ActivityNotFoundException ex) {
+                    Toast toast = Toast.makeText(this, "No application can edit this file", 10);
+                    toast.show();
+                }
+                return true;
+        }
+        return super.onContextItemSelected(item);
     }
 
     @Override

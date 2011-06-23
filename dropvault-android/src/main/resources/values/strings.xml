@@ -8,6 +8,8 @@
     <string name="files_menu_refresh">Refresh</string>
     <string name="files_menu_settings">Settings</string>
     
+    <string name="files_context_edit">Edit</string>
+    
     <string name="settings_account">Account details</string>
     
     <string name="settings_username_title">Username</string>
