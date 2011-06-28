@@ -23,7 +23,6 @@ import com.aperigeek.dropvault.android.dao.FilesDAO;
 import com.aperigeek.dropvault.android.dav.DAVException;
 import com.aperigeek.dropvault.android.dav.DropDAVClient;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
