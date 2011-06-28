@@ -176,6 +176,7 @@ public class FilesService {
                 in.close();
                 file.setLastModified(current.getLastModificationDate().getTime());
             }
+            dao.remove(current);
             dao.insert(parent, current);
 
             List<Resource> locals = dao.getChildren(current);
