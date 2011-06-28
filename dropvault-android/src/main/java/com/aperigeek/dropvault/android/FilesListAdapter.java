@@ -85,35 +85,9 @@ class FilesListAdapter implements ListAdapter {
         ImageView fileIcon = (ImageView) element.findViewById(R.id.file_icon);
         fileName.setText(resource.getName());
         
-        int icon = R.drawable.mimetype_application_octet_stream;
-        if (resource.getType() == Resource.ResourceType.FOLDER) {
-            icon = R.drawable.folder;
-        } else {
-            // TODO: Build a correspondance map
-            if ("application/pdf".equals(resource.getContentType())) {
-                icon = R.drawable.mimetype_application_pdf;
-            } else if ("text/plain".equals(resource.getContentType())) {
-                icon = R.drawable.mimetype_text_plain;
-            } else if ("text/html".equals(resource.getContentType())) {
-                icon = R.drawable.mimetype_text_html;
-            } else if ("application/rtf".equals(resource.getContentType())) {
-                icon = R.drawable.mimetype_application_rtf;
-            } else if ("application/msword".equals(resource.getContentType())) {
-                icon = R.drawable.mimetype_application_msword;
-            } else if ("application/zip".equals(resource.getContentType())) {
-                icon = R.drawable.mimetype_application_zip;
-            } else if ("image/png".equals(resource.getContentType())) {
-                icon = R.drawable.mimetype_image_generic;
-            } else if ("image/gif".equals(resource.getContentType())) {
-                icon = R.drawable.mimetype_image_generic;
-            } else if ("image/jpeg".equals(resource.getContentType())) {
-                icon = R.drawable.mimetype_image_generic;
-            } else if ("image/x-ms-bmp".equals(resource.getContentType())) {
-                icon = R.drawable.mimetype_image_generic;
-            } else if ("application/octet-stream".equals(resource.getContentType())) {
-                icon = R.drawable.mimetype_application_octet_stream;
-            }
-        }
+        int icon = resource.getType() == Resource.ResourceType.FOLDER
+                ? R.drawable.folder
+                : MimetypeIconMap.getIcon(resource.getContentType());
         fileIcon.setImageBitmap(BitmapFactory.decodeResource(element.getResources(), icon));
         
         return element;
