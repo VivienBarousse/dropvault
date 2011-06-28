@@ -170,23 +170,6 @@ public class FilesService {
         }
     }
     
-    /*
-    private void syncFile(DropDAVClient client, Resource remote, Resource local) throws DAVException, IOException {
-        File file = getFile(remote);
-        file.getParentFile().mkdirs();
-
-        FileOutputStream out = new FileOutputStream(file);
-        InputStream in = client.get(remote);
-        byte[] buffer = new byte[4096];
-        int readed;
-        while ((readed = in.read(buffer)) != -1) {
-            out.write(buffer, 0, readed);
-        }
-        out.close();
-        in.close();
-    }
-     */
-    
     protected String getBaseURI() {
         SharedPreferences prefs = context.getSharedPreferences("URI_PREFS", 0);
         return prefs.getString("baseURI", null);
