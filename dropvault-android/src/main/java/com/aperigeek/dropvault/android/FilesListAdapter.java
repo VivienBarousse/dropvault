@@ -102,6 +102,14 @@ class FilesListAdapter implements ListAdapter {
                 icon = R.drawable.mimetype_application_msword;
             } else if ("application/zip".equals(resource.getContentType())) {
                 icon = R.drawable.mimetype_application_zip;
+            } else if ("image/png".equals(resource.getContentType())) {
+                icon = R.drawable.mimetype_image_generic;
+            } else if ("image/gif".equals(resource.getContentType())) {
+                icon = R.drawable.mimetype_image_generic;
+            } else if ("image/jpeg".equals(resource.getContentType())) {
+                icon = R.drawable.mimetype_image_generic;
+            } else if ("image/x-ms-bmp".equals(resource.getContentType())) {
+                icon = R.drawable.mimetype_image_generic;
             }
         }
         fileIcon.setImageBitmap(BitmapFactory.decodeResource(element.getResources(), icon));
