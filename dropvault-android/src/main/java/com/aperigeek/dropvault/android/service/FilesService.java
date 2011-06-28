@@ -18,6 +18,7 @@ package com.aperigeek.dropvault.android.service;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.Environment;
 import com.aperigeek.dropvault.android.Resource;
 import com.aperigeek.dropvault.android.dao.FilesDAO;
 import com.aperigeek.dropvault.android.dav.DAVException;
@@ -97,8 +98,11 @@ public class FilesService {
     }
     
     public File getFile(Resource res) {
-        File folder = context.getExternalFilesDir(null);
+        File folder = Environment.getExternalStorageDirectory();
         folder = new File(folder, "DropVault");
+        if (!folder.exists()) {
+            folder.mkdir();
+        }
         
         String path = res.getHref().substring(getBaseURI().length());
         path = URLDecoder.decode(path);
