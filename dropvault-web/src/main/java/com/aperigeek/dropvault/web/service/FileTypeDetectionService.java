@@ -16,7 +16,9 @@
  */
 package com.aperigeek.dropvault.web.service;
 
+import eu.medsea.util.MimeUtil;
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.net.URLConnection;
 import java.util.logging.Level;
@@ -36,43 +38,13 @@ public class FileTypeDetectionService {
      * Tries to determine the content type of a given file depending on its 
      * content and name.
      * 
-     * The detection occurs according to the following process:
-     * <ul>
-     *     <li>The content type is guessed based on the content of the file</li>
-     *     <li>
-     *         If the content based detection fails, a new guess is attempted 
-     *         using the file name
-     *     </li>
-     *     <li>
-     *         If file name based detection fails, "application/octet-stream"
-     *         is returned
-     *     </li>
-     * </ul>
+     * The detection process is delegated to the mime-util library.
      * 
      * @param name File name
      * @param data File content
      * @return Detected file type
      */
     public String detectFileType(String name, byte[] data) {
-        // Content-based detection
-        String contentType = null;
-        try {
-            ByteArrayInputStream in = new ByteArrayInputStream(data);
-            contentType = URLConnection.guessContentTypeFromStream(in);
-        } catch (IOException ex) {
-            logger.log(Level.SEVERE, "Unexpected IO exception on internal stream", ex);
-        }
-
-        // File name based detection
-        if (contentType == null) {
-            contentType = URLConnection.guessContentTypeFromName(name);
-        }
-
-        // Default value
-        if (contentType == null) {
-            contentType = "application/octet-stream";
-        }
-
-        return contentType;
+        return MimeUtil.getMimeType(new ByteArrayInputStream(data));
     }
 }
