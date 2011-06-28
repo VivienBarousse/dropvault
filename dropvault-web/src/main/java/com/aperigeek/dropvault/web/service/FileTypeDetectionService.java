@@ -18,10 +18,6 @@ package com.aperigeek.dropvault.web.service;
 
 import eu.medsea.util.MimeUtil;
 import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.IOException;
-import java.net.URLConnection;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.ejb.Stateless;
 
