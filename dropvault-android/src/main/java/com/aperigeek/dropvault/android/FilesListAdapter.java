@@ -76,7 +76,6 @@ class FilesListAdapter implements ListAdapter {
     }
 
     public View getView(int i, View oldView, ViewGroup parent) {
-        
         Resource resource = files.get(i);
         
         // TODO: Reuse old view
