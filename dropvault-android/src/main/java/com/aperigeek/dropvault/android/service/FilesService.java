@@ -127,8 +127,6 @@ public class FilesService {
                 dbChildren.remove(dbChild);
             } else if (fsChild.isFile() &&
                     fsChild.lastModified() != dbChild.getLastModificationDate().getTime()) {
-                System.out.println("PUT " + dbChild.getHref());
-                System.out.println(fsChild.lastModified() + " " + dbChild.getLastModificationDate().getTime());
                 client.put(dbChild.getHref(), fsChild);
             }
             created.remove(fsChild);
