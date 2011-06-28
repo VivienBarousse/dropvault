@@ -20,6 +20,8 @@ import com.aperigeek.dropvault.android.Resource;
 import com.aperigeek.dropvault.android.Resource.ResourceType;
 import com.aperigeek.dropvault.android.dav.http.HttpMkcol;
 import com.aperigeek.dropvault.android.dav.http.HttpPropfind;
+import com.aperigeek.dropvault.android.dav.http.UnknownTypeFileEntity;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.DateFormat;
@@ -33,7 +35,6 @@ import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPut;
-import org.apache.http.entity.InputStreamEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -114,10 +115,10 @@ public class DAVClient {
         }
     }
     
-    public void put(String uri, InputStream in, long length) throws DAVException {
+    public void put(String uri, File file) throws DAVException {
         try {
             HttpPut put = new HttpPut(uri);
-            put.setEntity(new InputStreamEntity(in, length));
+            put.setEntity(new UnknownTypeFileEntity(file));
             
             HttpResponse response = client.execute(put);
             if (response.getStatusLine().getStatusCode() != 200) {
