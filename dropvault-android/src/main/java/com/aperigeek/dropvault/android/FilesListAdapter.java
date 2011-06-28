@@ -85,7 +85,7 @@ class FilesListAdapter implements ListAdapter {
         ImageView fileIcon = (ImageView) element.findViewById(R.id.file_icon);
         fileName.setText(resource.getName());
         
-        int icon = R.drawable.icon;
+        int icon = R.drawable.mimetype_application_octet_stream;
         if (resource.getType() == Resource.ResourceType.FOLDER) {
             icon = R.drawable.folder;
         } else {
@@ -110,6 +110,8 @@ class FilesListAdapter implements ListAdapter {
                 icon = R.drawable.mimetype_image_generic;
             } else if ("image/x-ms-bmp".equals(resource.getContentType())) {
                 icon = R.drawable.mimetype_image_generic;
+            } else if ("application/octet-stream".equals(resource.getContentType())) {
+                icon = R.drawable.mimetype_application_octet_stream;
             }
         }
         fileIcon.setImageBitmap(BitmapFactory.decodeResource(element.getResources(), icon));
