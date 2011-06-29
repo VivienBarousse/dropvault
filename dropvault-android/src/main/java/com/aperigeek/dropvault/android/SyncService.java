@@ -71,7 +71,7 @@ public class SyncService extends IntentService {
         showOngoingNotification();
         
         NotificationManager notificationManager = getNotificationManager();
-        int nIcon = R.drawable.icon;
+        int nIcon = R.drawable.dropvault;
 
         try {
             service.sync();
@@ -102,7 +102,7 @@ public class SyncService extends IntentService {
     }
     
     private void showOngoingNotification() {
-        Notification notification = new Notification(R.drawable.icon,
+        Notification notification = new Notification(R.drawable.dropvault,
                 getString(R.string.sync_ongoing_ticker), 
                 System.currentTimeMillis());
         notification.setLatestEventInfo(this, 
