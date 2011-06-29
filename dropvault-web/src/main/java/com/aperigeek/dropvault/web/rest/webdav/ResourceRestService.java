@@ -54,19 +54,6 @@ import net.java.dev.webdav.jaxrs.xml.elements.Rfc1123DateFormat;
 @Path("/dav/{user}/{resource:(.*)}")
 public class ResourceRestService extends AbstractResourceRestService {
     
-    /*
-     * Maximal content length allowed by this endpoint.
-     * 
-     * Fixed to 16 MiB minus 10 KiB due to a limitation in MongoDB. 
-     * But hey, that's more than 11 floppy disks!
-     * 
-     * The 16 MiB - 10 KiB value comes for a limitation in the BSON model
-     * used by MongoDB for its ondisk storage. BSON entities can't be
-     * bigger than 16 MiB, including fields other than the actual file content.
-     * 10 KiB are reserved for those other fields.
-     */
-    public static final long MAX_CONTENT_LENGTH = 16 * 1024 * 1024 - 10 * 1024;
-    
     @EJB
     private MongoFileService fileService;
     
@@ -151,10 +138,6 @@ public class ResourceRestService extends AbstractResourceRestService {
             return javax.ws.rs.core.Response.status(403).build();
         } catch (ProtocolException ex) {
             return javax.ws.rs.core.Response.status(400).build();
-        }
-        
-        if (contentLength > MAX_CONTENT_LENGTH) {
-            return javax.ws.rs.core.Response.status(507).build();
         }
         
         try {
