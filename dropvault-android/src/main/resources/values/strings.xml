@@ -20,4 +20,15 @@
     <string name="settings_password_summary">Password</string>
     <string name="settings_password_dialog">Password</string>
     
+    <string name="sync_ongoing_ticker">Syncing files</string>
+    <string name="sync_ongoing_title">Syncing files</string>
+    <string name="sync_ongoing_text">Synchronisation in progress</string>
+    
+    <string name="sync_error_ticker">Error during synchronisation</string>
+    <string name="sync_error_title">Error during synchronisation</string>
+    <string name="sync_error_text">Unknown error</string>
+    <string name="sync_error_text_cred">Invalid credentials</string>
+    <string name="sync_error_text_dav">Error dialoging with server</string>
+    <string name="sync_error_text_io">Error storing files on phone</string>
+    
 </resources>

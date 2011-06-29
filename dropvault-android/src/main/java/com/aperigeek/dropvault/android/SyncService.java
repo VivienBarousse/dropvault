@@ -78,17 +78,15 @@ public class SyncService extends IntentService {
         } catch (SyncException ex) {
             logger.log(Level.SEVERE, null, ex);
             
-            String tickerText = "Error while updating files";
-            String title = "Unknown error";
-            String text = ex.getMessage();
+            String tickerText = getString(R.string.sync_error_ticker);
+            String title = getString(R.string.sync_error_title);
+            String text = getString(R.string.sync_error_text);
             if (ex.getCause() instanceof InvalidPasswordException) {
-                title = "Invalid credentials";
+                title = getString(R.string.sync_error_text_cred);
             } else if (ex.getCause() instanceof DAVException) {
-                title = "Error connecting to server";
+                title = getString(R.string.sync_error_text_dav);
             } else if (ex.getCause() instanceof IOException) {
-                title = "Error copying file on phone";
-            } else {
-                title = "Unknown error during update";
+                title = getString(R.string.sync_error_text_io);
             }
             
             Notification n = new Notification(nIcon, tickerText, System.currentTimeMillis());
@@ -105,11 +103,11 @@ public class SyncService extends IntentService {
     
     private void showOngoingNotification() {
         Notification notification = new Notification(R.drawable.icon,
-                "Sync in progress", 
+                getString(R.string.sync_ongoing_ticker), 
                 System.currentTimeMillis());
         notification.setLatestEventInfo(this, 
-                "Synchronisation in progress", 
-                "",
+                getString(R.string.sync_ongoing_title), 
+                getString(R.string.sync_ongoing_text),
                 PendingIntent.getActivity(this, 0, new Intent(this, FilesListActivity.class), 0));
         
         notification.flags |= Notification.FLAG_ONGOING_EVENT;
