@@ -181,6 +181,9 @@ public class FilesService {
             locals.removeAll(remote);
 
             dao.removeAll(locals);
+            for (Resource remove : locals) {
+                getFile(remove).delete();
+            }
         }
         
         for (Resource child : remote) {
