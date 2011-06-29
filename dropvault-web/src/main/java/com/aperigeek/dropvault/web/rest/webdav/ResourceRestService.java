@@ -100,7 +100,7 @@ public class ResourceRestService extends AbstractResourceRestService {
     @GET
     public javax.ws.rs.core.Response get(@PathParam("user") String user,
             @PathParam("resource") String resource,
-            @HeaderParam("Authorization") String authorization) {
+            @HeaderParam("Authorization") String authorization) throws IOException {
         
         try {
             checkAuthentication(user, authorization);
@@ -234,7 +234,7 @@ public class ResourceRestService extends AbstractResourceRestService {
             @PathParam("user") String user,
             @PathParam("resource") String resource,
             @HeaderParam("Destination") String destination,
-            @HeaderParam("Authorization") String authorization) {
+            @HeaderParam("Authorization") String authorization) throws IOException {
         
         try {
             checkAuthentication(user, authorization);

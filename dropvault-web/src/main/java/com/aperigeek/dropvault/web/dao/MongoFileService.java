@@ -23,9 +23,19 @@ import com.mongodb.BasicDBObjectBuilder;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import org.bson.types.ObjectId;
@@ -36,6 +46,15 @@ import org.bson.types.ObjectId;
  */
 @Stateless
 public class MongoFileService {
+    
+    // TODO: export to configuration file
+    private static final File storageFolder = new File("/home/dropvault/storage");
+    
+    static {
+        if (!storageFolder.exists()) {
+            storageFolder.mkdirs();
+        }
+    }
     
     @EJB
     private MongoService mongo;
@@ -147,7 +166,7 @@ public class MongoFileService {
     }
     
     public void put(String username, String resource, byte[] data, 
-            String contentType) throws ResourceNotFoundException {
+            String contentType) throws ResourceNotFoundException, IOException {
         String[] path = resource.split("/");
         Resource parent = getRootFolder(username);
         for (int i = 0; i < path.length - 1; i++) {
@@ -165,6 +184,8 @@ public class MongoFileService {
         DBCollection files = mongo.getDataBase().getCollection("files");
         DBCollection contents = mongo.getDataBase().getCollection("contents");
         
+        File dataFile = createDataFile(data);
+        
         Resource child = getChild(parent, path[path.length - 1]);
         if (child != null) {
             DBObject filter = new BasicDBObject();
@@ -175,7 +196,7 @@ public class MongoFileService {
             files.update(filter, new BasicDBObject("$set", update));
             
             contents.update(new BasicDBObject("resource", child.getId()), 
-                    new BasicDBObject("$set", new BasicDBObject("binary", data)));
+                    new BasicDBObject("$set", new BasicDBObject("file", dataFile.getAbsolutePath())));
         } else {
             DBObject childObj = new BasicDBObject();
             ObjectId objId = new ObjectId();
@@ -193,7 +214,7 @@ public class MongoFileService {
             
             DBObject content = new BasicDBObject();
             content.put("resource", objId);
-            content.put("binary", data);
+            content.put("file", dataFile.getAbsolutePath());
             
             contents.insert(content);
         
@@ -234,14 +255,21 @@ public class MongoFileService {
                 new BasicDBObject("modificationDate", new Date())));
     }
     
-    public byte[] get(Resource resource) {
+    public byte[] get(Resource resource) throws IOException {
         DBCollection col = mongo.getDataBase().getCollection("contents");
         
         DBObject filter = new BasicDBObject();
         filter.put("resource", resource.getId());
         
         DBObject result = col.findOne(filter);
-        byte[] binary = (byte[]) result.get("binary");
+        byte[] binary;
+        if (result.containsField("file")) {
+            String fileName = (String) result.get("file");
+            File dataFile = new File(fileName);
+            binary = readFile(dataFile);
+        } else {
+            binary = (byte[]) result.get("binary");
+        }
         
         return binary;
     }
@@ -283,6 +311,31 @@ public class MongoFileService {
         }
         
         return childRes;
+    }
+    
+    protected byte[] readFile(File file) throws IOException {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        InputStream in = new BufferedInputStream(new FileInputStream(file));
+        
+        byte[] buffer = new byte[4096];
+        int readed;
+        while ((readed = in.read(buffer)) != -1) {
+            out.write(buffer, 0, readed);
+        }
+        
+        in.close();
+        
+        return out.toByteArray();
+    }
+    
+    protected File createDataFile(byte[] data) throws IOException {
+        File file = new File(storageFolder, UUID.randomUUID().toString());
+        
+        OutputStream out = new BufferedOutputStream(new FileOutputStream(file));
+        out.write(data);
+        out.close();
+        
+        return file;
     }
     
 }
