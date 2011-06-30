@@ -24,6 +24,10 @@ import java.util.Date;
  */
 public class Resource {
     
+    public static final int CREATED = 1;
+    
+    public static final int DELETED = 1 << 1;
+    
     public enum ResourceType {
         FILE,
         FOLDER;
@@ -39,6 +43,8 @@ public class Resource {
     
     private Date lastModificationDate;
     
+    private int flags;
+
     public Resource() {
     }
 
@@ -84,6 +90,38 @@ public class Resource {
 
     public void setLastModificationDate(Date lastModificationDate) {
         this.lastModificationDate = lastModificationDate;
+    }
+
+    public int getFlags() {
+        return flags;
+    }
+
+    public void setFlags(int flags) {
+        this.flags = flags;
+    }
+    
+    public boolean getCreated() {
+        return (flags & CREATED) != 0;
+    }
+    
+    public void setCreated(boolean created) {
+        if (created) {
+            flags |= CREATED;
+        } else {
+            flags &= 0xFFFFFFFF ^ CREATED;
+        }
+    }
+    
+    public boolean getDeleted() {
+        return (flags & DELETED) != 0;
+    }
+    
+    public void setDeleted(boolean deleted) {
+        if (deleted) {
+            flags |= DELETED;
+        } else {
+            flags &= 0xFFFFFFFF ^ DELETED;
+        }
     }
 
     @Override
