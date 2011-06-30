@@ -124,7 +124,7 @@ public class FilesService {
         
         for (Resource dbChild : dbChildren) {
             File fsChild = getFile(dbChild);
-            if (!fsChild.exists()) {
+            if (!fsChild.exists() || dbChild.getDeleted()) {
                 client.delete(dbChild.getHref());
                 dao.remove(dbChild);
             } else if (fsChild.isFile() &&
@@ -136,6 +136,9 @@ public class FilesService {
                 fsChild.setLastModified(remote.getLastModificationDate().getTime());
             }
             created.remove(fsChild);
+            if (dbChild.getCreated()) {
+                created.add(fsChild);
+            }
         }
         
         for (File createdFile : created) {
