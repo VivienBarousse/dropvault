@@ -54,7 +54,6 @@ public class FilesDAO extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        onCreate(db);
         for (int i = oldVersion; i <= newVersion; i++) {
             switch (i) {
                 case 7:
