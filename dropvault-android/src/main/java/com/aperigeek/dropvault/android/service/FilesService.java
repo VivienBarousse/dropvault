@@ -89,7 +89,7 @@ public class FilesService {
             setBaseURI(client.getBaseURI());
             
             push(client, client.getRootResource());
-            pull(client, null, client.getRootResource());
+            pull(client, client.getRootResource());
         } catch (DAVException ex) {
             throw new SyncException(ex);
         } catch (IOException ex) {
@@ -127,6 +127,10 @@ public class FilesService {
             } else if (fsChild.isFile() &&
                     fsChild.lastModified() != dbChild.getLastModificationDate().getTime()) {
                 client.put(dbChild.getHref(), fsChild);
+                Resource remote = client.getResource(dbChild.getHref());
+                dao.remove(remote);
+                dao.insert(dbFolder, remote);
+                fsChild.setLastModified(remote.getLastModificationDate().getTime());
             }
             created.remove(fsChild);
         }
@@ -135,12 +139,13 @@ public class FilesService {
             String href = dbFolder.getHref() + "/" + createdFile.getName();
             if (createdFile.isDirectory()) {
                 client.mkcol(href);
-                Resource createdRes = client.getResource(href);
-                dao.insert(createdRes);
-                dbChildren.add(createdRes);
             } else {
                 client.put(href, createdFile);
             }
+            Resource createdRes = client.getResource(href);
+            dao.insert(dbFolder, createdRes);
+            dbChildren.add(createdRes);
+            createdFile.setLastModified(createdRes.getLastModificationDate().getTime());
         }
         
         for (Resource dbChild : dbChildren) {
@@ -151,43 +156,52 @@ public class FilesService {
         
     }
     
-    private void pull(DropDAVClient client, Resource parent, Resource current) throws IOException, DAVException {
-        Resource local = dao.getResource(current.getHref());
-        List<Resource> remote = client.getResources(current, 1);
+    private void pull(DropDAVClient client, Resource remoteFolder) throws IOException, DAVException {
+        List<Resource> localChildren = dao.getChildren(remoteFolder);
+        List<Resource> remoteChildren = client.getResources(remoteFolder, 1);
         
-        if (local == null || !current.getLastModificationDate().equals(local.getLastModificationDate())) {
-            if (current.getType() == Resource.ResourceType.FILE) {
-                dao.insert(parent, current);
-
-                File file = getFile(current);
-                file.getParentFile().mkdirs();
-
-                FileOutputStream out = new FileOutputStream(file);
-                InputStream in = client.get(current);
-                byte[] buffer = new byte[4096];
-                int readed;
-                while ((readed = in.read(buffer)) != -1) {
-                    out.write(buffer, 0, readed);
+        for (Resource localChild : localChildren) {
+            if (!remoteChildren.contains(localChild)) {
+                dao.remove(localChild);
+                deleteR(getFile(localChild));
+            } else {
+                Resource remoteChild = client.getResource(localChild.getHref());
+                if (localChild.getType() == Resource.ResourceType.FILE &&
+                        !localChild.getLastModificationDate().equals(remoteChild.getLastModificationDate())) {
+                    copy(client, remoteChild);
+                    dao.remove(remoteChild);
+                    dao.insert(remoteFolder, remoteChild);
                 }
-                out.close();
-                in.close();
-                file.setLastModified(current.getLastModificationDate().getTime());
             }
-            dao.remove(current);
-            dao.insert(parent, current);
-
-            List<Resource> locals = dao.getChildren(current);
-            locals.removeAll(remote);
-
-            dao.removeAll(locals);
-            for (Resource remove : locals) {
-                deleteR(getFile(remove));
+            remoteChildren.remove(localChild);
+        }
+        
+        for (Resource created : remoteChildren) {
+            dao.insert(remoteFolder, created);
+            if (created.getType() == Resource.ResourceType.FOLDER) {
+                getFile(created).mkdir();
+                localChildren.add(created);
+            } else {
+                copy(client, created);
             }
         }
         
-        for (Resource child : remote) {
-            pull(client, current, child);
+        for (Resource child : localChildren) {
+            pull(client, child);
         }
+    }
+    
+    protected void copy(DropDAVClient client, Resource resource) throws DAVException, IOException {
+        File file = getFile(resource);
+        InputStream in = client.get(resource);
+        FileOutputStream out = new FileOutputStream(file);
+        byte[] buffer = new byte[4096];
+        int readed;
+        while ((readed = in.read(buffer)) != -1) {
+            out.write(buffer, 0, readed);
+        }
+        out.close();
+        file.setLastModified(resource.getLastModificationDate().getTime());
     }
     
     protected void deleteR(File file) {
