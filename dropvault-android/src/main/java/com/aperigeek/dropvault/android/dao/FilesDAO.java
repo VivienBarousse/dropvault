@@ -34,7 +34,7 @@ public class FilesDAO extends SQLiteOpenHelper {
 
     private static final String DB_NAME = "FILES";
     
-    private static final int DB_VERSION = 6;
+    private static final int DB_VERSION = 7;
 
     public FilesDAO(Context context) {
         super(context, DB_NAME, null, DB_VERSION);
@@ -54,8 +54,15 @@ public class FilesDAO extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DROP TABLE files;");
         onCreate(db);
+        for (int i = oldVersion; i <= newVersion; i++) {
+            switch (i) {
+                case 7:
+                    db.execSQL("ALTER TABLE files ADD COLUMN flags INTEGER;");
+                    db.execSQL("UPDATE files SET flags = 0;");
+                    break;
+            }
+        }
     }
     
     public Resource getParent(Resource resource) {
@@ -105,6 +112,7 @@ public class FilesDAO extends SQLiteOpenHelper {
                 "SELECT name, href, type, content_type, lastmodified "
                 + "FROM files "
                 + "WHERE parent=? "
+                + "AND flags != " + Resource.DELETED + " "
                 + "ORDER BY type DESC, name ASC",
                 new String[]{parent.getHref()});
         
@@ -125,7 +133,7 @@ public class FilesDAO extends SQLiteOpenHelper {
     
     public List<Resource> getAllResources() {
         Cursor cursor = getReadableDatabase().rawQuery(
-                "SELECT name, href, type, content_type, lastmodified FROM files",
+                "SELECT name, href, type, content_type, lastmodified, flags FROM files",
                 new String[]{});
         
         List<Resource> resources = new ArrayList<Resource>();
@@ -137,6 +145,7 @@ public class FilesDAO extends SQLiteOpenHelper {
             resource.setType(ResourceType.valueOf(cursor.getString(2)));
             resource.setContentType(cursor.getString(3));
             resource.setLastModificationDate(new Date(cursor.getLong(4)));
+            resource.setFlags(cursor.getInt(5));
             resources.add(resource);
         }
         
@@ -145,14 +154,15 @@ public class FilesDAO extends SQLiteOpenHelper {
     
     public void insert(Resource resource) {
         getWritableDatabase().execSQL("INSERT OR REPLACE "
-                + "INTO files(name,href,type,content_type,lastmodified)"
-                + "VALUES (?, ?, ?, ?, ?)", 
+                + "INTO files(name,href,type,content_type,lastmodified, flags)"
+                + "VALUES (?, ?, ?, ?, ?, ?)", 
                 new Object[]{
                     resource.getName(),
                     resource.getHref(),
                     resource.getType().toString(),
                     resource.getContentType(),
-                    resource.getLastModificationDate().getTime()
+                    resource.getLastModificationDate().getTime(),
+                    resource.getFlags()
                 });
     }
     
@@ -163,15 +173,16 @@ public class FilesDAO extends SQLiteOpenHelper {
         }
         
         getWritableDatabase().execSQL("INSERT OR REPLACE "
-                + "INTO files(name,href,type,content_type, parent, lastmodified)"
-                + "VALUES (?, ?, ?, ?, ?, ?)", 
+                + "INTO files(name,href,type,content_type, parent, lastmodified, flags)"
+                + "VALUES (?, ?, ?, ?, ?, ?, ?)", 
                 new Object[]{
                     resource.getName(),
                     resource.getHref(),
                     resource.getType().toString(),
                     resource.getContentType(),
                     parent.getHref(),
-                    resource.getLastModificationDate().getTime()
+                    resource.getLastModificationDate().getTime(),
+                    resource.getFlags()
                 });
     }
     
