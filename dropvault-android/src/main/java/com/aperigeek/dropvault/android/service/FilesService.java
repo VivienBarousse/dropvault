@@ -88,6 +88,10 @@ public class FilesService {
             
             setBaseURI(client.getBaseURI());
             
+            if (dao.getResource(client.getBaseURI()) == null) {
+                dao.insert(client.getRootResource());
+            }
+            
             push(client, client.getRootResource());
             pull(client, client.getRootResource());
         } catch (DAVException ex) {

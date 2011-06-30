@@ -48,8 +48,6 @@ import java.util.logging.Logger;
  */
 public class FilesListActivity extends ListActivity {
 
-    public static final String BASE_URI = "http://thom.aperigeek.com:8080/dropvault/rs/dav/viv/";
-    
     private static final Logger logger = Logger.getLogger(FilesListActivity.class.getName());
 
     private FilesService service;
@@ -66,7 +64,6 @@ public class FilesListActivity extends ListActivity {
         
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
         service = new FilesService(this);
-        current = service.getRoot();
     }
     
     @Override
@@ -75,6 +72,7 @@ public class FilesListActivity extends ListActivity {
 
         service.setUsername(prefs.getString("username", null));
         service.setPassword(prefs.getString("password", null));
+        current = service.getRoot();
         
         registerAdapter();
         
