@@ -89,8 +89,9 @@ public class ResourceRestService extends AbstractResourceRestService {
             @PathParam("resource") String resource,
             @HeaderParam("Authorization") String authorization) throws IOException {
         
+        String password;
         try {
-            checkAuthentication(user, authorization);
+            password = checkAuthentication(user, authorization);
         } catch (InvalidPasswordException ex) {
             return javax.ws.rs.core.Response.status(401)
                     .header("WWW-Authenticate", "Basic realm=\"DAV client\"")
@@ -107,7 +108,7 @@ public class ResourceRestService extends AbstractResourceRestService {
             return javax.ws.rs.core.Response.status(404).build();
         }
         
-        byte[] data = fileService.get(res);
+        byte[] data = fileService.get(user, res, password.toCharArray());
         ByteArrayInputStream in = new ByteArrayInputStream(data);
         
         return javax.ws.rs.core.Response.ok()
@@ -128,8 +129,9 @@ public class ResourceRestService extends AbstractResourceRestService {
             @HeaderParam("Authorization") String authorization,
             InputStream in) {
         
+        String password;
         try {
-            checkAuthentication(user, authorization);
+            password = checkAuthentication(user, authorization);
         } catch (InvalidPasswordException ex) {
             return javax.ws.rs.core.Response.status(401)
                     .header("WWW-Authenticate", "Basic realm=\"DAV client\"")
@@ -148,7 +150,7 @@ public class ResourceRestService extends AbstractResourceRestService {
                 out.write(buffer, 0, readed);
             }
             
-            fileService.put(user, resource, out.toByteArray(), contentType);
+            fileService.put(user, resource, out.toByteArray(), contentType, password.toCharArray());
             
             return javax.ws.rs.core.Response.ok().build();
         } catch (IOException ex) {
@@ -219,8 +221,9 @@ public class ResourceRestService extends AbstractResourceRestService {
             @HeaderParam("Destination") String destination,
             @HeaderParam("Authorization") String authorization) throws IOException {
         
+        String password;
         try {
-            checkAuthentication(user, authorization);
+            password = checkAuthentication(user, authorization);
         } catch (InvalidPasswordException ex) {
             return javax.ws.rs.core.Response.status(401)
                     .header("WWW-Authenticate", "Basic realm=\"DAV client\"")
@@ -235,9 +238,9 @@ public class ResourceRestService extends AbstractResourceRestService {
         String dest = URLDecoder.decode(destination).substring(uri.length() - resource.length());
         
         Resource res = fileService.getResource(user, resource);
-        byte[] data = fileService.get(res);
+        byte[] data = fileService.get(user, res, password.toCharArray());
         try {
-            fileService.put(user, dest, data, res.getContentType());
+            fileService.put(user, dest, data, res.getContentType(), password.toCharArray());
         } catch (ResourceNotFoundException ex) {
             javax.ws.rs.core.Response.status(209).build();
         }

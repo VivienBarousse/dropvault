@@ -32,10 +32,19 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.security.KeyStore;
+import java.security.KeyStore.SecretKeyEntry;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.crypto.Cipher;
+import javax.crypto.CipherInputStream;
+import javax.crypto.CipherOutputStream;
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import org.bson.types.ObjectId;
@@ -50,9 +59,14 @@ public class MongoFileService {
     // TODO: export to configuration file
     private static final File storageFolder = new File("/home/dropvault/storage");
     
+    private static final File secretsFolder = new File("/home/dropvault/secret");
+    
     static {
         if (!storageFolder.exists()) {
             storageFolder.mkdirs();
+        }
+        if (!secretsFolder.exists()) {
+            secretsFolder.mkdirs();
         }
     }
     
@@ -166,7 +180,7 @@ public class MongoFileService {
     }
     
     public void put(String username, String resource, byte[] data, 
-            String contentType) throws ResourceNotFoundException, IOException {
+            String contentType, char[] password) throws ResourceNotFoundException, IOException {
         String[] path = resource.split("/");
         Resource parent = getRootFolder(username);
         for (int i = 0; i < path.length - 1; i++) {
@@ -184,7 +198,7 @@ public class MongoFileService {
         DBCollection files = mongo.getDataBase().getCollection("files");
         DBCollection contents = mongo.getDataBase().getCollection("contents");
         
-        File dataFile = createDataFile(data);
+        File dataFile = createDataFile(data, username, password);
         
         Resource child = getChild(parent, path[path.length - 1]);
         if (child != null) {
@@ -255,7 +269,7 @@ public class MongoFileService {
                 new BasicDBObject("modificationDate", new Date())));
     }
     
-    public byte[] get(Resource resource) throws IOException {
+    public byte[] get(String username, Resource resource, char[] password) throws IOException {
         DBCollection col = mongo.getDataBase().getCollection("contents");
         
         DBObject filter = new BasicDBObject();
@@ -266,7 +280,7 @@ public class MongoFileService {
         if (result.containsField("file")) {
             String fileName = (String) result.get("file");
             File dataFile = new File(fileName);
-            binary = readFile(dataFile);
+            binary = readFile(dataFile, username, password);
         } else {
             binary = (byte[]) result.get("binary");
         }
@@ -313,29 +327,91 @@ public class MongoFileService {
         return childRes;
     }
     
-    protected byte[] readFile(File file) throws IOException {
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        InputStream in = new BufferedInputStream(new FileInputStream(file));
-        
-        byte[] buffer = new byte[4096];
-        int readed;
-        while ((readed = in.read(buffer)) != -1) {
-            out.write(buffer, 0, readed);
+    protected byte[] readFile(File file, String username, char[] password) throws IOException {
+        try {
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            InputStream fIn = new BufferedInputStream(new FileInputStream(file));
+            
+            Cipher cipher = Cipher.getInstance("Blowfish");
+            cipher.init(Cipher.DECRYPT_MODE, getSecretKey(username, password));
+            
+            CipherInputStream in = new CipherInputStream(fIn, cipher);
+            
+            byte[] buffer = new byte[4096];
+            int readed;
+            while ((readed = in.read(buffer)) != -1) {
+                out.write(buffer, 0, readed);
+            }
+            
+            in.close();
+            
+            return out.toByteArray();
+        } catch (Exception ex) {
+            // TODO: better exception handling
+            Logger.getAnonymousLogger().log(Level.SEVERE, "ERROR", ex);
+            throw new RuntimeException(ex);
         }
-        
-        in.close();
-        
-        return out.toByteArray();
     }
     
-    protected File createDataFile(byte[] data) throws IOException {
-        File file = new File(storageFolder, UUID.randomUUID().toString());
-        
-        OutputStream out = new BufferedOutputStream(new FileOutputStream(file));
-        out.write(data);
-        out.close();
-        
-        return file;
+    protected File createDataFile(byte[] data, String username, char[] password) throws IOException {
+        try {
+            File file = new File(storageFolder, UUID.randomUUID().toString());
+            
+            Cipher cipher = Cipher.getInstance("Blowfish");
+            cipher.init(Cipher.ENCRYPT_MODE, getSecretKey(username, password));
+            
+            OutputStream fOut = new BufferedOutputStream(new FileOutputStream(file));
+            CipherOutputStream out = new CipherOutputStream(fOut, cipher);
+            
+            out.write(data);
+            
+            out.flush();
+            out.close();
+            fOut.flush();
+            fOut.close();
+            
+            return file;
+        } catch (Exception ex) {
+            // TODO: better exception handling
+            Logger.getAnonymousLogger().log(Level.SEVERE, "ERROR", ex);
+            throw new RuntimeException(ex);
+        }
+    }
+    
+    protected SecretKey getSecretKey(String username, char[] password) {
+        try {
+            KeyStore store = getKeyStore(username, password);
+            SecretKeyEntry entry = (SecretKeyEntry) store.getEntry(username, new KeyStore.PasswordProtection(password));
+            return entry.getSecretKey();
+        } catch (Exception ex) {
+            // TODO: better exception handling
+            throw new RuntimeException(ex);
+        }
+    }
+    
+    protected KeyStore getKeyStore(String username, char[] password) {
+        try {
+            File keyStoreFile = new File(secretsFolder, username + ".jks");
+            KeyStore keyStore = KeyStore.getInstance("JCEKS");
+            if (keyStoreFile.exists()) {
+                keyStore.load(new FileInputStream(keyStoreFile), password);
+                return keyStore;
+            } else {
+                KeyGenerator gen = KeyGenerator.getInstance("Blowfish");
+                SecretKey key = gen.generateKey();
+                
+                keyStore.load(null, password);
+                keyStore.setEntry(username, new SecretKeyEntry(key), new KeyStore.PasswordProtection(password));
+                
+                keyStore.store(new FileOutputStream(keyStoreFile), password);
+                
+                return keyStore;
+            }
+        } catch (Exception ex) {
+            // TODO: better exception handling
+            Logger.getAnonymousLogger().log(Level.SEVERE, "ERROR", ex);
+            throw new RuntimeException(ex);
+        }
     }
     
 }

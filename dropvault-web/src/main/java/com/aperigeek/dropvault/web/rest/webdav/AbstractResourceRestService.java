@@ -121,7 +121,7 @@ public abstract class AbstractResourceRestService {
     
     protected abstract UsersDAO getUsersDAO();
     
-    protected void checkAuthentication(String username, String header) 
+    protected String checkAuthentication(String username, String header) 
             throws InvalidPasswordException, NotAuthorizedException, ProtocolException {
         
         if (header == null) {
@@ -147,13 +147,15 @@ public abstract class AbstractResourceRestService {
 
         String user = passwordMatcher.group(1);
         String password = passwordMatcher.group(2);
-        password = hashService.hash(password);
+        String hashPassword = hashService.hash(password);
         
-        getUsersDAO().login(user, password);
+        getUsersDAO().login(user, hashPassword);
         
         if (!user.equals(username)) {
             throw new NotAuthorizedException();
         }
+        
+        return password;
     }
     
 }
