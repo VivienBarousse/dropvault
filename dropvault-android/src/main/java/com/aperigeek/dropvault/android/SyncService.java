@@ -75,7 +75,7 @@ public class SyncService extends IntentService {
 
         try {
             service.sync();
-        } catch (SyncException ex) {
+        } catch (Exception ex) {
             logger.log(Level.SEVERE, null, ex);
             
             String tickerText = getString(R.string.sync_error_ticker);
