@@ -16,7 +16,7 @@
  */
 package com.aperigeek.dropvault.android.activity;
 
-import android.app.ListActivity;
+import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
@@ -33,7 +33,7 @@ import java.util.logging.Logger;
  *
  * @author Vivien Barousse
  */
-public class ReceiveFileActivity extends ListActivity {
+public class ReceiveFileActivity extends Activity {
     
     private static final Logger logger = Logger.getLogger(ReceiveFileActivity.class.getName());
 
@@ -62,7 +62,7 @@ public class ReceiveFileActivity extends ListActivity {
             Bundle extras = intent.getExtras();
             Uri uri = extras.getParcelable(Intent.EXTRA_STREAM);
             String mime = intent.getType();
-            String name = extras.getString(Intent.EXTRA_TITLE);
+            String name = uri.getLastPathSegment();
             
             try {
                 service.importFile(uri, mime, name);
@@ -77,6 +77,8 @@ public class ReceiveFileActivity extends ListActivity {
 
     @Override
     protected void onDestroy() {
+        super.onDestroy();
+        
         service.close();
     }
     
