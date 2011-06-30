@@ -113,7 +113,6 @@ public class FilesService {
     
     private void push(DropDAVClient client, Resource dbFolder) throws IOException, DAVException {
         File fsFolder = getFile(dbFolder);
-        System.out.println(fsFolder);
         
         List<Resource> dbChildren = dao.getChildren(dbFolder);
         List<File> created = new ArrayList<File>(
