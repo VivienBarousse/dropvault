@@ -182,13 +182,22 @@ public class FilesService {
 
             dao.removeAll(locals);
             for (Resource remove : locals) {
-                getFile(remove).delete();
+                deleteR(getFile(remove));
             }
         }
         
         for (Resource child : remote) {
             pull(client, current, child);
         }
+    }
+    
+    protected void deleteR(File file) {
+        if (file.isDirectory()) {
+            for (File f : file.listFiles()) {
+                deleteR(f);
+            }
+        }
+        file.delete();
     }
     
     protected String getBaseURI() {

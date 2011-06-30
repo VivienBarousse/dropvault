@@ -186,6 +186,9 @@ public class FilesDAO extends SQLiteOpenHelper {
     }
 
     public void remove(Resource res) {
+        for (Resource child : getChildren(res)) {
+            remove(child);
+        }
         getWritableDatabase().execSQL("DELETE FROM files WHERE href=?",
                 new String[]{res.getHref()});
     }
