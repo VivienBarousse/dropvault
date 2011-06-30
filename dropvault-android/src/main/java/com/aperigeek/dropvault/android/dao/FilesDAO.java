@@ -48,7 +48,8 @@ public class FilesDAO extends SQLiteOpenHelper {
                 + "type INTEGER,"
                 + "content_type TEXT,"
                 + "href TEXT PRIMARY KEY,"
-                + "lastmodified INTEGER"
+                + "lastmodified INTEGER,"
+                + "flags INTEGER"
                 + ");");
     }
 
