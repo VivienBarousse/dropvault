@@ -107,5 +107,10 @@ public class Resource {
         hash = 71 * hash + (this.href != null ? this.href.hashCode() : 0);
         return hash;
     }
+
+    @Override
+    public String toString() {
+        return "Resource{" + "href=" + href + '}';
+    }
     
 }
