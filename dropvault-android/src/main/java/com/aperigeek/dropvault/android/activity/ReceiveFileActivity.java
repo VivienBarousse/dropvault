@@ -43,6 +43,8 @@ public class ReceiveFileActivity extends ListActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
         
         String username = prefs.getString("username", null);
