@@ -55,6 +55,8 @@ public class ReceiveFileActivity extends ListActivity {
     
     @Override
     protected void onResume() {
+        super.onResume();
+        
         Intent intent = getIntent();
         if (Intent.ACTION_SEND.equals(intent.getAction())) {
             Bundle extras = intent.getExtras();
