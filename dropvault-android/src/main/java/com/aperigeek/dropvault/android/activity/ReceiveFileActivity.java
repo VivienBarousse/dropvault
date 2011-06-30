@@ -65,8 +65,7 @@ public class ReceiveFileActivity extends ListActivity {
             try {
                 service.importFile(uri, mime, name);
             } catch (IOException ex) {
-                Toast toast = new Toast(this);
-                toast.setText("Unable to import file");
+                Toast toast = Toast.makeText(this, "Unable to import file", 10);
                 toast.show();
             }
         }
