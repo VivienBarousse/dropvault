@@ -24,8 +24,6 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.widget.Toast;
 import com.aperigeek.dropvault.android.FilesListActivity;
-import com.aperigeek.dropvault.android.Resource;
-import com.aperigeek.dropvault.android.dao.FilesDAO;
 import com.aperigeek.dropvault.android.service.FilesService;
 import java.io.IOException;
 import java.util.logging.Level;
@@ -36,6 +34,8 @@ import java.util.logging.Logger;
  * @author Vivien Barousse
  */
 public class ReceiveFileActivity extends ListActivity {
+    
+    private static final Logger logger = Logger.getLogger(ReceiveFileActivity.class.getName());
 
     private SharedPreferences prefs;
     
@@ -65,6 +65,7 @@ public class ReceiveFileActivity extends ListActivity {
             try {
                 service.importFile(uri, mime, name);
             } catch (IOException ex) {
+                logger.log(Level.SEVERE, "IO error during file import", ex);
                 Toast toast = Toast.makeText(this, "Unable to import file", 10);
                 toast.show();
             }
