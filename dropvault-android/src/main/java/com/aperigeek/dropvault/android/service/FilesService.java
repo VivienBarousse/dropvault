@@ -18,18 +18,21 @@ package com.aperigeek.dropvault.android.service;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Environment;
 import com.aperigeek.dropvault.android.Resource;
 import com.aperigeek.dropvault.android.dao.FilesDAO;
 import com.aperigeek.dropvault.android.dav.DAVException;
 import com.aperigeek.dropvault.android.dav.DropDAVClient;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -76,6 +79,30 @@ public class FilesService {
     
     public List<Resource> getChildren(Resource parent) {
         return dao.getChildren(parent);
+    }
+    
+    public void importFile(Uri uri, String mimeType, String name) throws IOException {
+        Resource resource = new Resource();
+        resource.setName(name);
+        resource.setType(Resource.ResourceType.FILE);
+        resource.setContentType(mimeType);
+        resource.setHref(getRoot().getHref() + "/" + name);
+        resource.setLastModificationDate(new Date());
+        resource.setCreated(true);
+        dao.insert(getRoot(), resource);
+        
+        File file = getFile(resource);
+        
+        FileOutputStream out = new FileOutputStream(file);
+        InputStream in = context.getContentResolver().openInputStream(uri);
+        byte[] buffer = new byte[4096];
+        int readed;
+        while ((readed = in.read(buffer)) != -1) {
+            out.write(buffer, 0, readed);
+        }
+        out.close();
+        
+        file.setLastModified(resource.getLastModificationDate().getTime());
     }
     
     public void close() {
