@@ -29,7 +29,6 @@ import com.aperigeek.dropvault.R;
 import com.aperigeek.dropvault.android.dav.DAVException;
 import com.aperigeek.dropvault.android.dav.InvalidPasswordException;
 import com.aperigeek.dropvault.android.service.FilesService;
-import com.aperigeek.dropvault.android.service.SyncException;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -117,6 +116,13 @@ public class SyncService extends IntentService {
     
     private void hideOngoingNotification() {
         getNotificationManager().cancel(ONGOING_NOTIFICATION_ID);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        
+        service.close();
     }
     
     @Override
