@@ -9,7 +9,7 @@
     
     <modules>
         <module>dropvault-web</module>
-    <module>dropvault-android</module>
-  </modules>
+        <module>dropvault-android</module>
+    </modules>
     
 </project>
