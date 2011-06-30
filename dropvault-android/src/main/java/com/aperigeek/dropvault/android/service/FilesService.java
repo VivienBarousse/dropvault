@@ -127,7 +127,6 @@ public class FilesService {
             if (!fsChild.exists()) {
                 client.delete(dbChild.getHref());
                 dao.remove(dbChild);
-                dbChildren.remove(dbChild);
             } else if (fsChild.isFile() &&
                     fsChild.lastModified() != dbChild.getLastModificationDate().getTime()) {
                 client.put(dbChild.getHref(), fsChild);
