@@ -143,17 +143,16 @@ public class FilesService {
     }
     
     public void delete(Resource resource) {
-        dao.remove(resource);
-        resource.setDeleted(true);
-        dao.insert(resource);
-        
         deleteR(getFile(resource));
+        resource.setDeleted(true);
+        dao.insert(dao.getParent(resource), resource);
     }
     
     private void push(DropDAVClient client, Resource dbFolder) throws IOException, DAVException {
         File fsFolder = getFile(dbFolder);
         
-        List<Resource> dbChildren = dao.getChildren(dbFolder);
+        List<Resource> dbChildren = dao.getChildren(dbFolder, true);
+        System.out.println(dbChildren);
         List<File> created = new ArrayList<File>(
                 Arrays.asList(fsFolder.listFiles()));
         

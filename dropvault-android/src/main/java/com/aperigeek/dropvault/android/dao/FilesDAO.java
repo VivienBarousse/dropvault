@@ -108,11 +108,15 @@ public class FilesDAO extends SQLiteOpenHelper {
     }
     
     public List<Resource> getChildren(Resource parent) {
+        return getChildren(parent, false);
+    }
+    
+    public List<Resource> getChildren(Resource parent, boolean includeDeleted) {
         Cursor cursor = getReadableDatabase().rawQuery(
                 "SELECT name, href, type, content_type, lastmodified "
                 + "FROM files "
                 + "WHERE parent=? "
-                + "AND flags != " + Resource.DELETED + " "
+                + (!includeDeleted ? "AND flags != " + Resource.DELETED + " " : "")
                 + "ORDER BY type DESC, name ASC",
                 new String[]{parent.getHref()});
         
