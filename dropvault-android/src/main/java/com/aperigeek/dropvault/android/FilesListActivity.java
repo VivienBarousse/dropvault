@@ -176,6 +176,7 @@ public class FilesListActivity extends ListActivity {
 
                             public void onClick(DialogInterface di, int i) {
                                 service.delete(resource);
+                                registerAdapter();
                             }
                     
                         })
