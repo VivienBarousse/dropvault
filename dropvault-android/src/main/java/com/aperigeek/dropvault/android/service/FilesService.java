@@ -168,6 +168,9 @@ public class FilesService {
                 dao.insert(dbFolder, remote);
                 fsChild.setLastModified(remote.getLastModificationDate().getTime());
             }
+            
+            // Can't be replaced with if(!getCreated) {created.remove()}
+            // fsChild might not be in created
             created.remove(fsChild);
             if (dbChild.getCreated()) {
                 created.add(fsChild);
