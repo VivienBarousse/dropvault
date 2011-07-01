@@ -92,7 +92,7 @@ public abstract class AbstractResourceRestService {
     @OPTIONS
     public javax.ws.rs.core.Response options() {
         return javax.ws.rs.core.Response.ok()
-                .header("DAV", 1)
+                .header("DAV", "1, 2")
                 .header("Allow", "OPTIONS,MKCOL,GET,DELETE,MOVE,PROPFIND,COPY,HEAD,PUT")
                 .build();
     }
