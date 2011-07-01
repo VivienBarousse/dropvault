@@ -210,8 +210,8 @@ public class FilesService {
                 Resource remoteChild = client.getResource(localChild.getHref());
                 if (localChild.getType() == Resource.ResourceType.FILE &&
                         !localChild.getLastModificationDate().equals(remoteChild.getLastModificationDate())) {
-                    copy(client, remoteChild);
                     dao.remove(remoteChild);
+                    copy(client, remoteChild);
                     dao.insert(remoteFolder, remoteChild);
                 }
             }
@@ -219,13 +219,13 @@ public class FilesService {
         }
         
         for (Resource created : remoteChildren) {
-            dao.insert(remoteFolder, created);
             if (created.getType() == Resource.ResourceType.FOLDER) {
                 getFile(created).mkdir();
                 localChildren.add(created);
             } else {
                 copy(client, created);
             }
+            dao.insert(remoteFolder, created);
         }
         
         for (Resource child : localChildren) {
