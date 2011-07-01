@@ -9,6 +9,7 @@
     <string name="files_menu_settings">Settings</string>
     
     <string name="files_context_edit">Edit</string>
+    <string name="files_context_delete">Delete</string>
     
     <string name="settings_account">Account details</string>
     

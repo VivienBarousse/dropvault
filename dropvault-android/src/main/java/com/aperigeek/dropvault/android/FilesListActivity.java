@@ -164,6 +164,9 @@ public class FilesListActivity extends ListActivity {
                     toast.show();
                 }
                 return true;
+            case R.id.files_context_delete:
+                service.delete(resource);
+                return true;
         }
         return super.onContextItemSelected(item);
     }

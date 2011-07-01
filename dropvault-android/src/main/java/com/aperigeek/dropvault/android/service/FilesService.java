@@ -142,6 +142,14 @@ public class FilesService {
         return file;
     }
     
+    public void delete(Resource resource) {
+        dao.remove(resource);
+        resource.setDeleted(true);
+        dao.insert(resource);
+        
+        deleteR(getFile(resource));
+    }
+    
     private void push(DropDAVClient client, Resource dbFolder) throws IOException, DAVException {
         File fsFolder = getFile(dbFolder);
         

@@ -6,4 +6,9 @@
             android:titleCondensed="@string/files_context_edit" 
             android:icon="@android:drawable/ic_menu_edit" />
             
+    <item android:id="@+id/files_context_delete" 
+            android:title="@string/files_context_delete" 
+            android:titleCondensed="@string/files_context_delete" 
+            android:icon="@android:drawable/ic_menu_delete" />
+            
 </menu>
