@@ -30,6 +30,8 @@ import javax.ws.rs.OPTIONS;
 import javax.ws.rs.core.Response.StatusType;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
+import net.java.dev.webdav.jaxrs.methods.LOCK;
+import net.java.dev.webdav.jaxrs.methods.UNLOCK;
 import net.java.dev.webdav.jaxrs.xml.elements.HRef;
 import net.java.dev.webdav.jaxrs.xml.elements.MultiStatus;
 import net.java.dev.webdav.jaxrs.xml.elements.Prop;
@@ -94,6 +96,20 @@ public abstract class AbstractResourceRestService {
         return javax.ws.rs.core.Response.ok()
                 .header("DAV", "1, 2")
                 .header("Allow", "OPTIONS,MKCOL,GET,DELETE,MOVE,PROPFIND,COPY,HEAD,PUT")
+                .build();
+    }
+    
+    @LOCK
+    public javax.ws.rs.core.Response lock() {
+        // TODO: Proper lock support
+        return javax.ws.rs.core.Response.ok()
+                .build();
+    }
+    
+    @UNLOCK
+    public javax.ws.rs.core.Response unlock() {
+        // TODO: Proper unlock support
+        return javax.ws.rs.core.Response.noContent()
                 .build();
     }
 
