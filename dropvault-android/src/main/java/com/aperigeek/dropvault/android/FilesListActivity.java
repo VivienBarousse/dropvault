@@ -16,8 +16,11 @@
  */
 package com.aperigeek.dropvault.android;
 
+import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.content.ActivityNotFoundException;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
@@ -149,7 +152,7 @@ public class FilesListActivity extends ListActivity {
     @Override
     public boolean onContextItemSelected(MenuItem item) {
         AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
-        Resource resource = (Resource) adapter.getItem(info.position);
+        final Resource resource = (Resource) adapter.getItem(info.position);
         
         switch (item.getItemId()) {
             case R.id.files_context_edit:
@@ -165,7 +168,18 @@ public class FilesListActivity extends ListActivity {
                 }
                 return true;
             case R.id.files_context_delete:
-                service.delete(resource);
+                new AlertDialog.Builder(this)
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .setTitle("Delete")
+                        .setMessage("Are you sure you want to delete '" + resource.getName() + "'?")
+                        .setPositiveButton("Yes", new OnClickListener() {
+
+                            public void onClick(DialogInterface di, int i) {
+                                service.delete(resource);
+                            }
+                    
+                        })
+                        .setNegativeButton("No", null).show();
                 return true;
         }
         return super.onContextItemSelected(item);
