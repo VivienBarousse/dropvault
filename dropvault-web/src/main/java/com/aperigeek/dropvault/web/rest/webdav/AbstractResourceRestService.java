@@ -18,11 +18,14 @@ package com.aperigeek.dropvault.web.rest.webdav;
 
 import com.aperigeek.dropvault.web.beans.Resource;
 import com.aperigeek.dropvault.web.dao.MongoFileService;
+import com.aperigeek.dropvault.web.dao.ResourceNotFoundException;
 import com.aperigeek.dropvault.web.dao.user.InvalidPasswordException;
 import com.aperigeek.dropvault.web.dao.user.UsersDAO;
 import com.aperigeek.dropvault.web.service.HashService;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.ejb.EJB;
@@ -63,7 +66,12 @@ public abstract class AbstractResourceRestService {
         int depth = (depthStr == null || "Infinity".equals(depthStr)) ?
                 -1 : Integer.parseInt(depthStr);
         
-        Resource current = getFileService().getResource(user, resource);
+        Resource current;
+        try {
+            current = getFileService().getResource(user, resource);
+        } catch (ResourceNotFoundException ex) {
+            current = null;
+        }
         
         if (current == null) {
             return javax.ws.rs.core.Response.status(404).build();

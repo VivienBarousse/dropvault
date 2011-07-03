@@ -28,6 +28,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URLDecoder;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.ws.rs.Consumes;
@@ -102,7 +104,12 @@ public class ResourceRestService extends AbstractResourceRestService {
             return javax.ws.rs.core.Response.status(400).build();
         }
         
-        Resource res = fileService.getResource(user, resource);
+        Resource res;
+        try {
+            res = fileService.getResource(user, resource);
+        } catch (ResourceNotFoundException ex) {
+            res = null;
+        }
         
         if (res == null) {
             return javax.ws.rs.core.Response.status(404).build();
@@ -207,10 +214,14 @@ public class ResourceRestService extends AbstractResourceRestService {
             return javax.ws.rs.core.Response.status(400).build();
         }
         
-        Resource res = fileService.getResource(user, resource);
-        fileService.delete(res);
-        
-        return javax.ws.rs.core.Response.ok().build();
+        try {
+            Resource res = fileService.getResource(user, resource);
+            fileService.delete(res);
+
+            return javax.ws.rs.core.Response.ok().build();
+        } catch (ResourceNotFoundException ex) {
+            return javax.ws.rs.core.Response.status(404).build();
+        }
         
     }
     
@@ -237,7 +248,13 @@ public class ResourceRestService extends AbstractResourceRestService {
         String uri = URLDecoder.decode(uriInfo.getRequestUri().toString());
         String dest = URLDecoder.decode(destination).substring(uri.length() - resource.length());
         
-        Resource res = fileService.getResource(user, resource);
+        Resource res;
+        try {
+            res = fileService.getResource(user, resource);
+        } catch (ResourceNotFoundException ex) {
+            return javax.ws.rs.core.Response.status(404).build();
+        }
+        
         byte[] data = fileService.get(user, res, password.toCharArray());
         try {
             fileService.put(user, dest, data, res.getContentType(), password.toCharArray());
@@ -271,7 +288,13 @@ public class ResourceRestService extends AbstractResourceRestService {
         String uri = URLDecoder.decode(uriInfo.getRequestUri().toString());
         String dest = URLDecoder.decode(destination).substring(uri.length() - resource.length());
         
-        Resource res = fileService.getResource(user, resource);
+        Resource res;
+        try {
+            res = fileService.getResource(user, resource);
+        } catch (ResourceNotFoundException ex) {
+            return javax.ws.rs.core.Response.status(404).build();
+        }
+        
         try {
             fileService.move(user, res, dest);
         } catch (ResourceNotFoundException ex) {

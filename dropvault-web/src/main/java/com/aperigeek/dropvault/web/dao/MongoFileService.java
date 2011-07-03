@@ -170,10 +170,13 @@ public class MongoFileService {
         return buildResource(obj);
     }
     
-    public Resource getResource(String username, String resource) {
+    public Resource getResource(String username, String resource) throws ResourceNotFoundException {
         String[] path = resource.split("/");
         Resource parent = getRootFolder(username);
         for (int i = 0; i < path.length; i++) {
+            if (parent == null) {
+                throw new ResourceNotFoundException();
+            }
             parent = getChild(parent, path[i]);
         }
         return parent;
