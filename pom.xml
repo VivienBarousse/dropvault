@@ -10,6 +10,7 @@
     <modules>
         <module>dropvault-web</module>
         <module>dropvault-android</module>
-    </modules>
+    <module>dropvault-client-java</module>
+  </modules>
     
 </project>
