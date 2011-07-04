@@ -21,6 +21,7 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Environment;
 import com.aperigeek.dropvault.android.Resource;
+import com.aperigeek.dropvault.android.dao.AndroidFilesDAO;
 import com.aperigeek.dropvault.android.dao.FilesDAO;
 import com.aperigeek.dropvault.android.dav.DAVException;
 import com.aperigeek.dropvault.android.dav.DropDAVClient;
@@ -50,7 +51,7 @@ public class FilesService {
     
     public FilesService(Context context) {
         this.context = context;
-        dao = new FilesDAO(context);
+        dao = new AndroidFilesDAO(context);
     }
     
     public FilesService(String username, String password, Context context) {
