@@ -5,3 +5,7 @@ and is intended to be used as a mount point on your computer.
 
 The android application keeps a local copy of the shared folder and allows
 you to access your files even when your phone is offline.
+
+All files are encrypted by the server side storage engine. The key to decrypt
+all files is your password, and it isn't stored in clear in the application.
+This makes you the only one able to decrypt and download your files.
