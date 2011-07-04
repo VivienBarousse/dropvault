@@ -14,37 +14,27 @@
  * You should have received a copy of the GNU General Public License
  * along with dropvault.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.aperigeek.dropvault.android.dao;
-
-import com.aperigeek.dropvault.android.Resource;
-import java.util.List;
+package com.aperigeek.dropvault.service;
 
 /**
  *
  * @author Vivien Barousse
  */
-public interface FilesDAO {
-    
-    public Resource getParent(Resource resource);
-    
-    public Resource getResource(String baseURI);
-    
-    public List<Resource> getChildren(Resource parent);
-    
-    public List<Resource> getChildren(Resource parent, boolean includeDeleted);
-    
-    public List<Resource> getAllResources();
-    
-    public void insert(Resource resource);
-    
-    public void insert(Resource parent, Resource resource);
-    
-    public void clear();
+public class SyncException extends FilesServiceException {
 
-    public void removeAll(List<Resource> remove);
+    public SyncException() {
+    }
 
-    public void remove(Resource res);
-    
-    public void close();
+    public SyncException(String message) {
+        super(message);
+    }
+
+    public SyncException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public SyncException(Throwable cause) {
+        super(cause);
+    }
     
 }

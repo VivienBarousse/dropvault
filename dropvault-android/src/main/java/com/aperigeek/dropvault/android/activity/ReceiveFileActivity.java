@@ -30,7 +30,7 @@ import android.widget.Toast;
 import com.aperigeek.dropvault.R;
 import com.aperigeek.dropvault.android.FilesListActivity;
 import com.aperigeek.dropvault.android.service.AndroidFilesService;
-import com.aperigeek.dropvault.android.service.FilesService;
+import com.aperigeek.dropvault.service.FilesService;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.logging.Level;

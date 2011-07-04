@@ -14,31 +14,12 @@
  * You should have received a copy of the GNU General Public License
  * along with dropvault.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.aperigeek.dropvault.android.dav.http;
-
-import java.net.URI;
-import org.apache.http.client.methods.HttpRequestBase;
+package com.aperigeek.dropvault.dav;
 
 /**
  *
  * @author Vivien Barousse
  */
-public class HttpPropfind extends HttpRequestBase {
-
-    public HttpPropfind() {
-    }
-    
-    public HttpPropfind(String uri) {
-        this(URI.create(uri));
-    }
-    
-    public HttpPropfind(URI uri) {
-        setURI(uri);
-    }
-
-    @Override
-    public String getMethod() {
-        return "PROPFIND";
-    }
+public class InvalidPasswordException extends DAVException {
     
 }

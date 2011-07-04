@@ -14,30 +14,27 @@
  * You should have received a copy of the GNU General Public License
  * along with dropvault.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.aperigeek.dropvault.android.dav.http;
-
-import java.io.File;
-import org.apache.http.Header;
-import org.apache.http.entity.FileEntity;
+package com.aperigeek.dropvault.service;
 
 /**
  *
  * @author Vivien Barousse
  */
-public class UnknownTypeFileEntity extends FileEntity {
+public class FilesServiceException extends Exception {
 
-    public UnknownTypeFileEntity(File file) {
-        super(file, "application/octet-stream");
+    public FilesServiceException(Throwable cause) {
+        super(cause);
     }
 
-    @Override
-    public Header getContentEncoding() {
-        return null;
+    public FilesServiceException(String message, Throwable cause) {
+        super(message, cause);
     }
 
-    @Override
-    public Header getContentType() {
-        return null;
+    public FilesServiceException(String message) {
+        super(message);
+    }
+
+    public FilesServiceException() {
     }
     
 }

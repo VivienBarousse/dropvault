@@ -14,8 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with dropvault.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.aperigeek.dropvault.android;
+package com.aperigeek.dropvault;
 
+import com.aperigeek.dropvault.Resource;
 import junit.framework.TestCase;
 
 /**

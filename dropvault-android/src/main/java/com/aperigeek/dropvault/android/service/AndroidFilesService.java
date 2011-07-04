@@ -16,6 +16,8 @@
  */
 package com.aperigeek.dropvault.android.service;
 
+import com.aperigeek.dropvault.service.AbstractFilesService;
+import com.aperigeek.dropvault.service.FilesService;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Environment;

@@ -14,13 +14,13 @@
  * You should have received a copy of the GNU General Public License
  * along with dropvault.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.aperigeek.dropvault.android.dav;
+package com.aperigeek.dropvault.dav;
 
-import com.aperigeek.dropvault.android.Resource;
-import com.aperigeek.dropvault.android.Resource.ResourceType;
-import com.aperigeek.dropvault.android.dav.http.HttpMkcol;
-import com.aperigeek.dropvault.android.dav.http.HttpPropfind;
-import com.aperigeek.dropvault.android.dav.http.UnknownTypeFileEntity;
+import com.aperigeek.dropvault.Resource;
+import com.aperigeek.dropvault.Resource.ResourceType;
+import com.aperigeek.dropvault.dav.http.HttpMkcol;
+import com.aperigeek.dropvault.dav.http.HttpPropfind;
+import com.aperigeek.dropvault.dav.http.UnknownTypeFileEntity;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;

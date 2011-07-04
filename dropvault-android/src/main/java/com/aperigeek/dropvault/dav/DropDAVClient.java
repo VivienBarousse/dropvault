@@ -14,10 +14,10 @@
  * You should have received a copy of the GNU General Public License
  * along with dropvault.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.aperigeek.dropvault.android.dav;
+package com.aperigeek.dropvault.dav;
 
-import com.aperigeek.dropvault.android.Resource;
-import com.aperigeek.dropvault.android.service.HashService;
+import com.aperigeek.dropvault.Resource;
+import com.aperigeek.dropvault.service.HashService;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;

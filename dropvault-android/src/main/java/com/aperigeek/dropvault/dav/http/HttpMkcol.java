@@ -14,27 +14,31 @@
  * You should have received a copy of the GNU General Public License
  * along with dropvault.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.aperigeek.dropvault.android.service;
+package com.aperigeek.dropvault.dav.http;
+
+import java.net.URI;
+import org.apache.http.client.methods.HttpRequestBase;
 
 /**
  *
  * @author Vivien Barousse
  */
-public class FilesServiceException extends Exception {
+public class HttpMkcol extends HttpRequestBase {
 
-    public FilesServiceException(Throwable cause) {
-        super(cause);
+    public HttpMkcol() {
+    }
+    
+    public HttpMkcol(String uri) {
+        this(URI.create(uri));
+    }
+    
+    public HttpMkcol(URI uri) {
+        setURI(uri);
     }
 
-    public FilesServiceException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    public FilesServiceException(String message) {
-        super(message);
-    }
-
-    public FilesServiceException() {
+    @Override
+    public String getMethod() {
+        return "MKCOL";
     }
     
 }

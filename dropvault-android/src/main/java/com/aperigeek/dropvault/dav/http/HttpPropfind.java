@@ -14,27 +14,31 @@
  * You should have received a copy of the GNU General Public License
  * along with dropvault.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.aperigeek.dropvault.android.service;
+package com.aperigeek.dropvault.dav.http;
+
+import java.net.URI;
+import org.apache.http.client.methods.HttpRequestBase;
 
 /**
  *
  * @author Vivien Barousse
  */
-public class SyncException extends FilesServiceException {
+public class HttpPropfind extends HttpRequestBase {
 
-    public SyncException() {
+    public HttpPropfind() {
+    }
+    
+    public HttpPropfind(String uri) {
+        this(URI.create(uri));
+    }
+    
+    public HttpPropfind(URI uri) {
+        setURI(uri);
     }
 
-    public SyncException(String message) {
-        super(message);
-    }
-
-    public SyncException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    public SyncException(Throwable cause) {
-        super(cause);
+    @Override
+    public String getMethod() {
+        return "PROPFIND";
     }
     
 }

@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with dropvault.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.aperigeek.dropvault.android.service;
+package com.aperigeek.dropvault.service;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;

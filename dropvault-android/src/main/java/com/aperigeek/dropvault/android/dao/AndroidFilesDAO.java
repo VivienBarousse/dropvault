@@ -16,12 +16,13 @@
  */
 package com.aperigeek.dropvault.android.dao;
 
+import com.aperigeek.dropvault.dao.FilesDAO;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import com.aperigeek.dropvault.android.Resource;
-import com.aperigeek.dropvault.android.Resource.ResourceType;
+import com.aperigeek.dropvault.Resource;
+import com.aperigeek.dropvault.Resource.ResourceType;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;

@@ -16,6 +16,7 @@
  */
 package com.aperigeek.dropvault.android;
 
+import com.aperigeek.dropvault.Resource;
 import android.database.DataSetObserver;
 import android.graphics.BitmapFactory;
 import android.view.LayoutInflater;

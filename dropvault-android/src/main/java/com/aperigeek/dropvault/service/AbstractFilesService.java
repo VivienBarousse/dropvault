@@ -14,12 +14,12 @@
  * You should have received a copy of the GNU General Public License
  * along with dropvault.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.aperigeek.dropvault.android.service;
+package com.aperigeek.dropvault.service;
 
-import com.aperigeek.dropvault.android.Resource;
-import com.aperigeek.dropvault.android.dao.FilesDAO;
-import com.aperigeek.dropvault.android.dav.DAVException;
-import com.aperigeek.dropvault.android.dav.DropDAVClient;
+import com.aperigeek.dropvault.Resource;
+import com.aperigeek.dropvault.dao.FilesDAO;
+import com.aperigeek.dropvault.dav.DAVException;
+import com.aperigeek.dropvault.dav.DropDAVClient;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
