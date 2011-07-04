@@ -38,6 +38,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 import com.aperigeek.dropvault.R;
 import com.aperigeek.dropvault.android.Resource.ResourceType;
+import com.aperigeek.dropvault.android.service.AndroidFilesService;
 import com.aperigeek.dropvault.android.service.FilesService;
 import com.aperigeek.dropvault.android.settings.SettingsActivity;
 import java.io.File;
@@ -66,7 +67,7 @@ public class FilesListActivity extends ListActivity {
         super.onCreate(savedInstanceState);
         
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        service = new FilesService(this);
+        service = new AndroidFilesService(this);
     }
     
     @Override

@@ -28,6 +28,7 @@ import android.preference.PreferenceManager;
 import com.aperigeek.dropvault.R;
 import com.aperigeek.dropvault.android.dav.DAVException;
 import com.aperigeek.dropvault.android.dav.InvalidPasswordException;
+import com.aperigeek.dropvault.android.service.AndroidFilesService;
 import com.aperigeek.dropvault.android.service.FilesService;
 import java.io.IOException;
 import java.util.logging.Level;
@@ -59,7 +60,7 @@ public class SyncService extends IntentService {
         
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
         
-        service = new FilesService(this);
+        service = new AndroidFilesService(this);
         service.setUsername(prefs.getString("username", null));
         service.setPassword(prefs.getString("password", null));
     }

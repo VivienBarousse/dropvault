@@ -29,6 +29,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 import com.aperigeek.dropvault.R;
 import com.aperigeek.dropvault.android.FilesListActivity;
+import com.aperigeek.dropvault.android.service.AndroidFilesService;
 import com.aperigeek.dropvault.android.service.FilesService;
 import java.io.IOException;
 import java.util.logging.Level;
@@ -61,7 +62,7 @@ public class ReceiveFileActivity extends Activity implements OnClickListener {
         String username = prefs.getString("username", null);
         String password = prefs.getString("password", null);
         
-        service = new FilesService(username, password, this);
+        service = new AndroidFilesService(username, password, this);
     }
     
     @Override
