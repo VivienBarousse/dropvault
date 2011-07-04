@@ -11,6 +11,7 @@
         <module>dropvault-web</module>
         <module>dropvault-android</module>
     <module>dropvault-client-java</module>
+    <module>dropvault-desktop</module>
   </modules>
     
 </project>
