@@ -16,10 +16,10 @@
  */
 package com.aperigeek.dropvault.android.service;
 
-import android.net.Uri;
 import com.aperigeek.dropvault.android.Resource;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
 /**
@@ -34,7 +34,7 @@ public interface FilesService {
     
     public List<Resource> getChildren(Resource parent);
     
-    public void importFile(Uri uri, String mimeType, String name) throws IOException;
+    public void importFile(InputStream in, String mimeType, String name) throws IOException;
     
     public void close();
     

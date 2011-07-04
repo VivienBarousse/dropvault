@@ -32,6 +32,7 @@ import com.aperigeek.dropvault.android.FilesListActivity;
 import com.aperigeek.dropvault.android.service.AndroidFilesService;
 import com.aperigeek.dropvault.android.service.FilesService;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -92,7 +93,8 @@ public class ReceiveFileActivity extends Activity implements OnClickListener {
             name = nameText.getText().toString();
             
             try {
-                service.importFile(uri, mime, name);
+                InputStream in = getContentResolver().openInputStream(uri);
+                service.importFile(in, mime, name);
             } catch (IOException ex) {
                 logger.log(Level.SEVERE, "IO error during file import", ex);
                 Toast toast = Toast.makeText(this, "Unable to import file", 10);
