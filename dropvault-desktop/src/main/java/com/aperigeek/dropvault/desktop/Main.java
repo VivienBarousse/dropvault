@@ -16,14 +16,19 @@
  */
 package com.aperigeek.dropvault.desktop;
 
+import com.aperigeek.dropvault.desktop.service.DesktopFilesService;
+import com.aperigeek.dropvault.service.FilesService;
+import com.aperigeek.dropvault.service.SyncException;
+
 /**
  *
  * @author Vivien Barousse
  */
 public class Main {
     
-    public static void main(String[] args) {
-        
+    public static void main(String[] args) throws SyncException {
+        FilesService service = new DesktopFilesService("viv", "viv");
+        service.sync();
     }
     
 }
