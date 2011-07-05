@@ -142,7 +142,6 @@ public abstract class AbstractFilesService implements FilesService {
         File fsFolder = getFile(dbFolder);
         
         List<Resource> dbChildren = dao.getChildren(dbFolder, true);
-        System.out.println(dbChildren);
         List<File> created = new ArrayList<File>(
                 Arrays.asList(fsFolder.listFiles()));
         
