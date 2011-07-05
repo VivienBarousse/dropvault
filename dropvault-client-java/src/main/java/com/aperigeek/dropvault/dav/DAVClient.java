@@ -121,6 +121,7 @@ public class DAVClient {
             put.setEntity(new UnknownTypeFileEntity(file));
             
             HttpResponse response = client.execute(put);
+            response.getEntity().consumeContent();
             if (response.getStatusLine().getStatusCode() != 200) {
                 throw new DAVException("Invalid status code:"
                         + response.getStatusLine().getStatusCode()
@@ -137,6 +138,7 @@ public class DAVClient {
             HttpDelete delete = new HttpDelete(uri);
             
             HttpResponse response = client.execute(delete);
+            response.getEntity().consumeContent();
             if (response.getStatusLine().getStatusCode() != 200) {
                 throw new DAVException("Invalid status code:"
                         + response.getStatusLine().getStatusCode()
@@ -153,6 +155,7 @@ public class DAVClient {
             HttpMkcol mkcol = new HttpMkcol(uri);
             
             HttpResponse response = client.execute(mkcol);
+            response.getEntity().consumeContent();
             if (response.getStatusLine().getStatusCode() != 201) {
                 throw new DAVException("Invalid status code:"
                         + response.getStatusLine().getStatusCode()
