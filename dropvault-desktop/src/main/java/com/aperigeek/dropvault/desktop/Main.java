@@ -19,6 +19,7 @@ package com.aperigeek.dropvault.desktop;
 import com.aperigeek.dropvault.desktop.service.DesktopFilesService;
 import com.aperigeek.dropvault.service.FilesService;
 import com.aperigeek.dropvault.service.SyncException;
+import java.io.Console;
 
 /**
  *
@@ -27,7 +28,12 @@ import com.aperigeek.dropvault.service.SyncException;
 public class Main {
     
     public static void main(String[] args) throws SyncException {
-        FilesService service = new DesktopFilesService("viv", "viv");
+        Console console = System.console();
+        System.out.print("Username: ");
+        String username = console.readLine();
+        System.out.print("Password: ");         
+        String password = new String(console.readPassword());
+        FilesService service = new DesktopFilesService(username, password);
         service.sync();
     }
     
