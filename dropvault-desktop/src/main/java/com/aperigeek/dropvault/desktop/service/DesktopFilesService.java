@@ -28,6 +28,8 @@ import java.io.File;
  */
 public class DesktopFilesService extends AbstractFilesService implements FilesService {
 
+    private File storageDirectory;
+    
     public DesktopFilesService() {
         super(new DesktopFilesDAO(new File(new File(System.getProperty("user.home")), "DropVaultDB")));
     }
@@ -38,12 +40,18 @@ public class DesktopFilesService extends AbstractFilesService implements FilesSe
 
     @Override
     protected File getStorageDirectory() {
-        File userHome = new File(System.getProperty("user.home"));
-        File folder = new File(userHome, "DropVault");
-        if (!folder.exists()) {
-            folder.mkdirs();
+        if (storageDirectory == null) {
+            File userHome = new File(System.getProperty("user.home"));
+            File storageDirectory = new File(userHome, "DropVault");
+            if (!storageDirectory.exists()) {
+                storageDirectory.mkdirs();
+            }
         }
-        return folder;
+        return storageDirectory;
+    }
+
+    public void setStorageDirectory(File storageDirectory) {
+        this.storageDirectory = storageDirectory;
     }
 
     @Override
