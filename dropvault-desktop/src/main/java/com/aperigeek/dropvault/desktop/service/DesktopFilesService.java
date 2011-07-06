@@ -16,15 +16,11 @@
  */
 package com.aperigeek.dropvault.desktop.service;
 
-import com.aperigeek.dropvault.dav.DAVException;
 import com.aperigeek.dropvault.dav.DropDAVClient;
-import com.aperigeek.dropvault.dav.InvalidPasswordException;
 import com.aperigeek.dropvault.desktop.dao.DesktopFilesDAO;
 import com.aperigeek.dropvault.service.AbstractFilesService;
 import com.aperigeek.dropvault.service.FilesService;
 import java.io.File;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *

@@ -19,7 +19,6 @@ package com.aperigeek.dropvault.desktop.dao;
 import com.aperigeek.dropvault.Resource;
 import com.aperigeek.dropvault.Resource.ResourceType;
 import com.aperigeek.dropvault.dao.FilesDAO;
-import java.awt.Cursor;
 import java.io.File;
 import java.sql.Connection;
 import java.sql.DriverManager;
