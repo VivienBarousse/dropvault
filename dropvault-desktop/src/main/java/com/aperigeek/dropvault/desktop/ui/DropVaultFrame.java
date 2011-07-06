@@ -17,17 +17,18 @@
 package com.aperigeek.dropvault.desktop.ui;
 
 import com.aperigeek.dropvault.desktop.service.DesktopFilesService;
+import com.aperigeek.dropvault.desktop.ui.event.FolderSelectionListener;
+import com.aperigeek.dropvault.desktop.ui.layout.CenteredLayout;
 import com.aperigeek.dropvault.service.FilesService;
 import com.aperigeek.dropvault.service.SyncException;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.FlowLayout;
-import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.io.File;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -40,6 +41,8 @@ import javax.swing.JTextField;
  * @author Vivien Barousse
  */
 public class DropVaultFrame extends JFrame {
+    
+    private JPanel glassPane;
 
     private JPanel mainPane;
     
@@ -53,7 +56,7 @@ public class DropVaultFrame extends JFrame {
     
     private JButton syncButton;
     
-    private FilesService filesService;
+    private DesktopFilesService filesService;
 
     public DropVaultFrame() {
         filesService = new DesktopFilesService();
@@ -76,6 +79,8 @@ public class DropVaultFrame extends JFrame {
             }
         
         });
+        
+        step1();
     }
 
     private void init() {
@@ -107,6 +112,27 @@ public class DropVaultFrame extends JFrame {
         mainPane.add(syncPane);
         
         setContentPane(mainPane);
+    }
+    
+    private void step1() {
+        glassPane = (JPanel) getGlassPane();
+        glassPane.setLayout(new CenteredLayout());
+        glassPane.setOpaque(true);
+        glassPane.setVisible(true);
+        
+        FolderSelectionPane folderSelectionPane = new FolderSelectionPane();
+        
+        folderSelectionPane.addFolderSelectionListener(new FolderSelectionListener() {
+
+            @Override
+            public void folderSelected(File folder) {
+                filesService.setStorageDirectory(folder);
+                glassPane.setVisible(false);
+            }
+            
+        });
+        
+        glassPane.add(folderSelectionPane);
     }
     
     private void sync() {
