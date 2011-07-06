@@ -16,10 +16,8 @@
  */
 package com.aperigeek.dropvault.desktop;
 
-import com.aperigeek.dropvault.desktop.service.DesktopFilesService;
-import com.aperigeek.dropvault.service.FilesService;
-import com.aperigeek.dropvault.service.SyncException;
-import java.io.Console;
+import com.aperigeek.dropvault.desktop.ui.DropVaultFrame;
+import javax.swing.UIManager;
 
 /**
  *
@@ -27,14 +25,15 @@ import java.io.Console;
  */
 public class Main {
     
-    public static void main(String[] args) throws SyncException {
-        Console console = System.console();
-        System.out.print("Username: ");
-        String username = console.readLine();
-        System.out.print("Password: ");         
-        String password = new String(console.readPassword());
-        FilesService service = new DesktopFilesService(username, password);
-        service.sync();
+    public static void main(String[] args) {
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (Exception ex) {
+            // Do nothing, report a warning?
+        }
+        
+        DropVaultFrame frame = new DropVaultFrame();
+        frame.setVisible(true);
     }
     
 }
