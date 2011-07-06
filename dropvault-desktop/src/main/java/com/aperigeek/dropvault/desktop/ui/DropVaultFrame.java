@@ -18,12 +18,10 @@ package com.aperigeek.dropvault.desktop.ui;
 
 import com.aperigeek.dropvault.desktop.service.DesktopFilesService;
 import com.aperigeek.dropvault.desktop.ui.event.FolderSelectionListener;
+import com.aperigeek.dropvault.desktop.ui.event.LoginListener;
 import com.aperigeek.dropvault.desktop.ui.layout.CenteredLayout;
-import com.aperigeek.dropvault.service.FilesService;
 import com.aperigeek.dropvault.service.SyncException;
 import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
@@ -33,8 +31,6 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JPasswordField;
-import javax.swing.JTextField;
 
 /**
  *
@@ -45,12 +41,6 @@ public class DropVaultFrame extends JFrame {
     private JPanel glassPane;
 
     private JPanel mainPane;
-    
-    private JPanel loginPane;
-    
-    private JTextField usernameField;
-    
-    private JPasswordField passwordField;
     
     private JPanel syncPane;
     
@@ -86,15 +76,7 @@ public class DropVaultFrame extends JFrame {
     private void init() {
         mainPane = new JPanel(new BorderLayout());
 
-        loginPane = new JPanel(new FlowLayout());
-
-        usernameField = new JTextField("Username", 10);
-        passwordField = new JPasswordField("Password", 10);
-
-        loginPane.add(usernameField);
-        loginPane.add(passwordField);
-
-        syncPane = new JPanel();
+        syncPane = new JPanel(new CenteredLayout());
 
         syncButton = new JButton("Sync");
         syncButton.addActionListener(new ActionListener() {
@@ -108,7 +90,6 @@ public class DropVaultFrame extends JFrame {
 
         syncPane.add(syncButton);
 
-        mainPane.add(loginPane, BorderLayout.NORTH);
         mainPane.add(syncPane);
         
         setContentPane(mainPane);
@@ -128,17 +109,39 @@ public class DropVaultFrame extends JFrame {
             public void folderSelected(File folder) {
                 filesService.setStorageDirectory(folder);
                 glassPane.setVisible(false);
+                step2();
             }
             
         });
         
+        glassPane.removeAll();
         glassPane.add(folderSelectionPane);
     }
     
-    private void sync() {
-        filesService.setUsername(usernameField.getText());
-        filesService.setPassword(new String(passwordField.getPassword()));
+    private void step2() {
+        glassPane = (JPanel) getGlassPane();
+        glassPane.setLayout(new CenteredLayout());
+        glassPane.setOpaque(true);
+        glassPane.setVisible(true);
         
+        LoginPane loginPane = new LoginPane();
+        
+        loginPane.addLoginListener(new LoginListener() {
+
+            @Override
+            public void loggedIn(String username, char[] password) {
+                filesService.setUsername(username);
+                filesService.setPassword(new String(password));
+                glassPane.setVisible(false);
+            }
+            
+        });
+        
+        glassPane.removeAll();
+        glassPane.add(loginPane);
+    }
+    
+    private void sync() {
         try {
             filesService.sync();
         } catch (SyncException ex) {
