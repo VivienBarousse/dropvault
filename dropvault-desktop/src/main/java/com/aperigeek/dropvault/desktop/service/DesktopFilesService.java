@@ -17,6 +17,8 @@
 package com.aperigeek.dropvault.desktop.service;
 
 import com.aperigeek.dropvault.dav.DropDAVClient;
+import com.aperigeek.dropvault.desktop.config.ConfigManager;
+import com.aperigeek.dropvault.desktop.config.LocalStorageManager;
 import com.aperigeek.dropvault.desktop.dao.DesktopFilesDAO;
 import com.aperigeek.dropvault.service.AbstractFilesService;
 import com.aperigeek.dropvault.service.FilesService;
@@ -28,30 +30,25 @@ import java.io.File;
  */
 public class DesktopFilesService extends AbstractFilesService implements FilesService {
 
-    private File storageDirectory;
+    private LocalStorageManager storageManager;
     
-    public DesktopFilesService() {
-        super(new DesktopFilesDAO(new File(new File(System.getProperty("user.home")), "DropVaultDB")));
+    private ConfigManager configManager;
+    
+    public DesktopFilesService(LocalStorageManager storageManager) {
+        super(new DesktopFilesDAO(storageManager.getDatabaseStorageFolder()));
+        this.storageManager = storageManager;
+        configManager = storageManager.getConfigManager();
     }
 
-    public DesktopFilesService(String username, String password) {
-        super(username, password, new DesktopFilesDAO(new File(new File(System.getProperty("user.home")), "DropVaultDB")));
+    public DesktopFilesService(String username, String password, LocalStorageManager storageManager) {
+        this(storageManager);
+        setUsername(username);
+        setPassword(password);
     }
 
     @Override
     protected File getStorageDirectory() {
-        if (storageDirectory == null) {
-            File userHome = new File(System.getProperty("user.home"));
-            File storageDirectory = new File(userHome, "DropVault");
-            if (!storageDirectory.exists()) {
-                storageDirectory.mkdirs();
-            }
-        }
-        return storageDirectory;
-    }
-
-    public void setStorageDirectory(File storageDirectory) {
-        this.storageDirectory = storageDirectory;
+        return new File(configManager.getValue("files.dir", null));
     }
 
     @Override

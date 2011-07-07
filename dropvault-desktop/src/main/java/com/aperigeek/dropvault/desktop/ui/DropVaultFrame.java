@@ -16,12 +16,15 @@
  */
 package com.aperigeek.dropvault.desktop.ui;
 
+import com.aperigeek.dropvault.desktop.config.ConfigManager;
+import com.aperigeek.dropvault.desktop.config.LocalStorageManager;
 import com.aperigeek.dropvault.desktop.service.DesktopFilesService;
 import com.aperigeek.dropvault.desktop.ui.event.FolderSelectionListener;
 import com.aperigeek.dropvault.desktop.ui.event.LoginListener;
 import com.aperigeek.dropvault.desktop.ui.layout.CenteredLayout;
 import com.aperigeek.dropvault.service.SyncException;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
@@ -47,9 +50,15 @@ public class DropVaultFrame extends JFrame {
     private JButton syncButton;
     
     private DesktopFilesService filesService;
+    
+    private LocalStorageManager storageManager;
+    
+    private ConfigManager configManager;
 
-    public DropVaultFrame() {
-        filesService = new DesktopFilesService();
+    public DropVaultFrame(LocalStorageManager storageManager) {
+        this.storageManager = storageManager;
+        configManager =  storageManager.getConfigManager();
+        filesService = new DesktopFilesService(storageManager);
 
         init();
 
@@ -90,55 +99,70 @@ public class DropVaultFrame extends JFrame {
 
         syncPane.add(syncButton);
 
+        mainPane.add(new JButton("This is a useless button"), BorderLayout.NORTH);
         mainPane.add(syncPane);
         
         setContentPane(mainPane);
     }
     
     private void step1() {
-        glassPane = (JPanel) getGlassPane();
-        glassPane.setLayout(new CenteredLayout());
-        glassPane.setOpaque(true);
-        glassPane.setVisible(true);
-        
-        FolderSelectionPane folderSelectionPane = new FolderSelectionPane();
-        
-        folderSelectionPane.addFolderSelectionListener(new FolderSelectionListener() {
+        if (!configManager.containsKey("files.dir")) {
+            glassPane = (JPanel) getGlassPane();
+            glassPane.setLayout(new CenteredLayout());
+            glassPane.setBackground(new Color(0, 0, 0, 127));
+            glassPane.setOpaque(true);
+            glassPane.setVisible(true);
 
-            @Override
-            public void folderSelected(File folder) {
-                filesService.setStorageDirectory(folder);
-                glassPane.setVisible(false);
-                step2();
-            }
-            
-        });
-        
-        glassPane.removeAll();
-        glassPane.add(folderSelectionPane);
+            FolderSelectionPane folderSelectionPane = new FolderSelectionPane();
+
+            folderSelectionPane.addFolderSelectionListener(new FolderSelectionListener() {
+
+                @Override
+                public void folderSelected(File folder) {
+                    configManager.setValue("files.dir", folder.getAbsolutePath());
+                    glassPane.setVisible(false);
+                    step2();
+                }
+
+            });
+
+            glassPane.removeAll();
+            glassPane.add(folderSelectionPane);
+        } else {
+            step2();
+        }
     }
     
     private void step2() {
-        glassPane = (JPanel) getGlassPane();
-        glassPane.setLayout(new CenteredLayout());
-        glassPane.setOpaque(true);
-        glassPane.setVisible(true);
-        
-        LoginPane loginPane = new LoginPane();
-        
-        loginPane.addLoginListener(new LoginListener() {
+        if (!configManager.containsKey("username") ||
+                !configManager.containsKey("password")) {
+            glassPane = (JPanel) getGlassPane();
+            glassPane.setLayout(new CenteredLayout());
+            glassPane.setOpaque(true);
+            glassPane.setVisible(true);
 
-            @Override
-            public void loggedIn(String username, char[] password) {
-                filesService.setUsername(username);
-                filesService.setPassword(new String(password));
-                glassPane.setVisible(false);
-            }
+            LoginPane loginPane = new LoginPane();
             
-        });
-        
-        glassPane.removeAll();
-        glassPane.add(loginPane);
+            loginPane.setUsername(configManager.getValue("username", ""));
+            loginPane.setPassword(configManager.getValue("password", ""));
+
+            loginPane.addLoginListener(new LoginListener() {
+
+                @Override
+                public void loggedIn(String username, char[] password) {
+                    filesService.setUsername(username);
+                    filesService.setPassword(new String(password));
+                    glassPane.setVisible(false);
+                }
+
+            });
+
+            glassPane.removeAll();
+            glassPane.add(loginPane);
+        } else {
+            filesService.setUsername(configManager.getValue("username", null));
+            filesService.setPassword(configManager.getValue("password", null));
+        }
     }
     
     private void sync() {

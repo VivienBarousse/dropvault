@@ -117,8 +117,20 @@ public class LoginPane extends JPanel {
         return loginField.getText();
     }
     
+    public void setUsername(String username) {
+        loginField.setText(username);
+    }
+    
     public char[] getPassword() {
         return passwordField.getPassword();
+    }
+    
+    public void setPassword(char[] password) {
+        setPassword(new String(password));
+    }
+    
+    public void setPassword(String password) {
+        passwordField.setText(password);
     }
     
 }

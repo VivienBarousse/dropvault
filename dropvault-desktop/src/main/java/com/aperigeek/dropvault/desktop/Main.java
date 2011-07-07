@@ -16,7 +16,9 @@
  */
 package com.aperigeek.dropvault.desktop;
 
+import com.aperigeek.dropvault.desktop.config.LocalStorageManager;
 import com.aperigeek.dropvault.desktop.ui.DropVaultFrame;
+import java.io.File;
 import javax.swing.UIManager;
 
 /**
@@ -32,7 +34,11 @@ public class Main {
             // Do nothing, report a warning?
         }
         
-        DropVaultFrame frame = new DropVaultFrame();
+        File storage = new File(System.getProperty("user.home"));
+        storage = new File(storage, ".dropvault");
+        LocalStorageManager storageManager = new LocalStorageManager(storage);
+        
+        DropVaultFrame frame = new DropVaultFrame(storageManager);
         frame.setVisible(true);
     }
     
