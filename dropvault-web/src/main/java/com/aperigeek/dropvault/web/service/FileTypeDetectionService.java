@@ -16,10 +16,12 @@
  */
 package com.aperigeek.dropvault.web.service;
 
-import eu.medsea.util.MimeUtil;
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.ejb.Stateless;
+import org.apache.tika.Tika;
 
 /**
  *
@@ -34,13 +36,20 @@ public class FileTypeDetectionService {
      * Tries to determine the content type of a given file depending on its 
      * content and name.
      * 
-     * The detection process is delegated to the mime-util library.
+     * The detection process is delegated to the Apache Tika library.
      * 
      * @param name File name
      * @param data File content
      * @return Detected file type
      */
     public String detectFileType(String name, byte[] data) {
-        return MimeUtil.getMimeType(new ByteArrayInputStream(data));
+        Tika tika = new Tika();
+        try {
+            return tika.detect(new ByteArrayInputStream(data), name);
+        } catch (IOException ex) {
+            throw new RuntimeException(
+                    "IO exception during manipulation of byte array. Weird...",
+                    ex);
+        }
     }
 }
