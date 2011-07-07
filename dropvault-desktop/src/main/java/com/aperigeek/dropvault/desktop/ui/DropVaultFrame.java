@@ -99,7 +99,6 @@ public class DropVaultFrame extends JFrame {
 
         syncPane.add(syncButton);
 
-        mainPane.add(new JButton("This is a useless button"), BorderLayout.NORTH);
         mainPane.add(syncPane);
         
         setContentPane(mainPane);
