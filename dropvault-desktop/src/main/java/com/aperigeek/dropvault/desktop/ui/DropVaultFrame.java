@@ -149,6 +149,8 @@ public class DropVaultFrame extends JFrame {
 
                 @Override
                 public void loggedIn(String username, char[] password) {
+                    configManager.setValue("username", username);
+                    configManager.setValue("password", new String(password));
                     filesService.setUsername(username);
                     filesService.setPassword(new String(password));
                     glassPane.setVisible(false);
