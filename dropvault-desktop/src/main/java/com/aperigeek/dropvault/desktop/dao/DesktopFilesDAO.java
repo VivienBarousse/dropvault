@@ -39,8 +39,6 @@ public class DesktopFilesDAO implements FilesDAO {
 
     private static final String DRIVER = "org.apache.derby.jdbc.EmbeddedDriver";
     
-    private static final String DB_NAME = "FILES";
-    
     private Connection connection;
     
     private File derbyDb;

@@ -168,6 +168,7 @@ public class DropVaultFrame extends JFrame {
         try {
             filesService.sync();
         } catch (SyncException ex) {
+            ex.printStackTrace(System.err);
             JOptionPane.showMessageDialog(this, ex.getMessage(), "Error during sync", JOptionPane.ERROR_MESSAGE);
         }
     }
