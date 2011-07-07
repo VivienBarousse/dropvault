@@ -48,11 +48,6 @@
             <version>1.5</version>
         </dependency>
         <dependency>
-            <groupId>net.sf.mime-util</groupId>
-            <artifactId>mime-util</artifactId>
-            <version>1.2</version>
-        </dependency>
-          <dependency>
             <groupId>org.apache.tika</groupId>
             <artifactId>tika-core</artifactId>
             <version>0.9</version>
