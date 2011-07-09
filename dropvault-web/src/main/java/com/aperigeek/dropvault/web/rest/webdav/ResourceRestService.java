@@ -202,8 +202,9 @@ public class ResourceRestService extends AbstractResourceRestService {
             @PathParam("resource") String resource,
             @HeaderParam("Authorization") String authorization) {
         
+        String password;
         try {
-            checkAuthentication(user, authorization);
+            password = checkAuthentication(user, authorization);
         } catch (InvalidPasswordException ex) {
             return javax.ws.rs.core.Response.status(401)
                     .header("WWW-Authenticate", "Basic realm=\"DAV client\"")
@@ -216,7 +217,7 @@ public class ResourceRestService extends AbstractResourceRestService {
         
         try {
             Resource res = fileService.getResource(user, resource);
-            fileService.delete(res);
+            fileService.delete(user, password, res);
 
             return javax.ws.rs.core.Response.ok().build();
         } catch (ResourceNotFoundException ex) {

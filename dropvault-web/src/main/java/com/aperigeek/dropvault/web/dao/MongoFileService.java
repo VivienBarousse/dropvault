@@ -17,7 +17,10 @@
 package com.aperigeek.dropvault.web.dao;
 
 import com.aperigeek.dropvault.web.beans.Resource;
+import com.aperigeek.dropvault.web.service.ContentExtractionService;
 import com.aperigeek.dropvault.web.service.FileTypeDetectionService;
+import com.aperigeek.dropvault.web.service.IndexException;
+import com.aperigeek.dropvault.web.service.IndexService;
 import com.mongodb.BasicDBObject;
 import com.mongodb.BasicDBObjectBuilder;
 import com.mongodb.DBCollection;
@@ -25,6 +28,7 @@ import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -37,6 +41,7 @@ import java.security.KeyStore.SecretKeyEntry;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -75,6 +80,12 @@ public class MongoFileService {
     
     @EJB
     private FileTypeDetectionService fileTypeDetectionService;
+    
+    @EJB
+    private ContentExtractionService extractionService;
+    
+    @EJB
+    private IndexService indexService;
     
     public Resource getRootFolder(String username) {
         DBCollection files = mongo.getDataBase().getCollection("files");
@@ -238,6 +249,20 @@ public class MongoFileService {
             files.update(new BasicDBObject("_id", parent.getId()), 
                     new BasicDBObject("$set", 
                     new BasicDBObject("modificationDate", new Date())));
+            
+            child = buildResource(childObj);
+        }
+        
+        try {
+            Map<String, String> metadata = extractionService.extractContent(path[path.length - 1], 
+                    new ByteArrayInputStream(data), 
+                    contentType);
+            
+            metadata.put("name", path[path.length - 1]);
+            
+            indexService.index(username, new String(password), child.getId().toString(), metadata);
+        } catch (Exception ex) {
+            Logger.getLogger(MongoFileService.class.getName()).log(Level.SEVERE, "Index failed for " + path[path.length - 1], ex);
         }
     }
     
@@ -291,12 +316,12 @@ public class MongoFileService {
         return binary;
     }
     
-    public void delete(Resource resource) {
+    public void delete(String username, String password, Resource resource) {
         DBCollection files = mongo.getDataBase().getCollection("files");
         DBCollection contents = mongo.getDataBase().getCollection("contents");
         
         for (Resource child : getChildren(resource)) {
-            delete(child);
+            delete(username, password, child);
         }
         
         DBObject filter = new BasicDBObject("_id", resource.getId());
@@ -308,6 +333,12 @@ public class MongoFileService {
         
         files.remove(filter);
         contents.remove(new BasicDBObject("resource", resource.getId()));
+        
+        try {
+            indexService.remove(username, password, resource.getId().toString());
+        } catch (IndexException ex) {
+            Logger.getLogger(MongoFileService.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
     
     protected Resource buildResource(DBObject obj) {

@@ -40,7 +40,8 @@ public class RestApplication extends Application {
         return new HashSet<Class<?>>(Arrays.asList(
                 RootFolderRestService.class,
                 ResourceRestService.class,
-                LoginRestService.class));
+                LoginRestService.class,
+                SearchService.class));
     }
     
     @Override
