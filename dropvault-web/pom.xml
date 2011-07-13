@@ -62,11 +62,6 @@
             <artifactId>lucene-core</artifactId>
             <version>3.3.0</version>
         </dependency>
-        <dependency>
-            <groupId>com.googlecode.lucenetransform</groupId>
-            <artifactId>lucenetransform</artifactId>
-            <version>0.9.2.1</version>
-        </dependency>
             
         <dependency>
             <groupId>javax</groupId>
