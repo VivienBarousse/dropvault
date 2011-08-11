@@ -1,0 +1,3 @@
+[submodule "dropvault-android"]
+	path = dropvault-android
+	url = git@github.com:VivienBarousse/dropvault-android.git
