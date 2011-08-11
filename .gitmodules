@@ -1,3 +1,18 @@
 [submodule "dropvault-android"]
 	path = dropvault-android
 	url = git@github.com:VivienBarousse/dropvault-android.git
+[submodule "dropvault-java-client"]
+	path = dropvault-java-client
+	url = git@github.com:VivienBarousse/dropvault-java-client.git
+[submodule "dropvault-java-desktop"]
+	path = dropvault-java-desktop
+	url = git@github.com:VivienBarousse/dropvault-java-desktop.git
+[submodule "dropvault-server"]
+	path = dropvault-server
+	url = git@github.com:VivienBarousse/dropvault-server.git
+[submodule "dropvault-web-client"]
+	path = dropvault-web-client
+	url = git@github.com:VivienBarousse/dropvault-web-client.git
+[submodule "dropvault-icons"]
+	path = dropvault-icons
+	url = git@github.com:VivienBarousse/dropvault-icons.git
